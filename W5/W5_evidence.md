@@ -224,6 +224,21 @@ restore data:
 - **Rate Limit:** 50 requests/second
 - **Burst Limit:** 100 requests
 
+**Why HTTP API instead of REST API?**
+
+- **Lower cost:** HTTP API is ~70% cheaper than REST API ($1.00/million vs $3.50/million requests)
+- **Lower latency:** HTTP API has significantly lower overhead (~10ms vs ~30ms added latency)
+- **Simpler architecture:** FoodieDash only needs Lambda proxy integration + authorizer — no need for REST API's advanced features (request/response transformation, API keys via usage plans, caching, WAF integration)
+- **Native JWT/Lambda authorizer support:** HTTP API supports Lambda authorizers with simple response format (payload v2.0), which is sufficient for API key validation
+- **Auto-deploy:** HTTP API auto-deploys changes without manual stage management
+
+**When would we switch to REST API?**
+
+- Need request/response transformation or mapping templates
+- Need built-in API key management with usage plans and quotas per client
+- Need AWS WAF integration at the API Gateway level
+- Need response caching at the gateway layer
+
 **Lambda Authorizer:**
 
 - **Function:** foodiedash-api-authorizer
