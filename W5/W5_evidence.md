@@ -75,6 +75,8 @@ FoodieDash is a single-product application with uniform security requirements ac
 - **Retention:** 7 days
 - **IAM Role:** vpc-flow-logs-role
 - **Status:** ACTIVE
+![flow_logs](image-32.png)
+
 
 **Verification command:**
 
@@ -120,7 +122,7 @@ Private App Subnet (AZ-b) → Firewall Endpoint (AZ-b) → NAT Gateway → Inter
 - **Firewall Subnet AZ-b:** 10.0.193.0/24
 - **Rule Group:** foodiedash-egress-domain-allowlist (STATEFUL)
 - **Policy:** Unmatched traffic → DROP (allowlist behavior)
-- **Alert Logs:** CloudWatch — /aws/network-firewall/foodiedash/alert
+- **Alert Logs:** CloudWatch — /aws/network-firewall/alert/xops-w5-dmk-network-firewall_2026-05-15-04
 - **Flow Logs:** CloudWatch — /aws/network-firewall/foodiedash/flow
 
 **Domain Allowlist (Stateful Rule Group):**
@@ -151,7 +153,7 @@ Traffic flow: Private App Subnet → Firewall Endpoint → NAT Gateway → Inter
 
 A request to a non-allowlisted domain is dropped by the firewall and visible in Alert Logs.
 
-→ 📸 Insert screenshot: screenshots/mh2_blocked_request_alert.png (Alert Log showing BLOCKED/DROPPED request)
+![mh2_blocked_request_alert](image-7.png)
 
 ---
 
@@ -180,13 +182,13 @@ A request to a non-allowlisted domain is dropped by the firewall and visible in 
 - **Backup Vault:** foodiedash-backup-vault
 - **Schedule:** cron(0 3 * * ? *) — Daily at 3:00 AM UTC
 - **Retention:** 7 days
+![backup_vault](image-33.png)
 
 **Resources covered by backup plan:**
 
-- **EFS (File System):** fs-0563aa506ddf480ed → MH3 file storage ✅
-- **DocumentDB (Database):** foodiedash-docdb-cluster → W3 database ✅
-
-> **Note:** EBS volume (W2 requirement) should also be added to the backup plan if applicable.
+- **EFS (File System):** fs-0563aa506ddf480ed → MH3 file storage 
+- **DocumentDB (Database):** foodiedash-docdb-cluster → W3 database 
+![backup_plan](image-34.png)
 
 ### 4c. On-Demand Backup Evidence
 
@@ -194,7 +196,6 @@ A request to a non-allowlisted domain is dropped by the firewall and visible in 
 - **State:** COMPLETED
 - **PercentDone:** 100.0%
 - **RecoveryPointArn:** arn:aws:backup:us-west-2:910012064913:recovery-point:f98f0350-e4c3-4e7a-998d-4d0d2444654d
-
 ![mh3_backup_job_complete](image-8.png)
 
 ### 4d. Restore Test Evidence
@@ -205,10 +206,10 @@ A request to a non-allowlisted domain is dropped by the firewall and visible in 
 - **CreatedResourceArn:** arn:aws:elasticfilesystem:us-west-2:910012064913:file-system/fs-0cbed9b73103297c1
 - **New EFS ID:** fs-0cbed9b73103297c1 (restored from fs-0563aa506ddf480ed)
 - **Metadata:** newFileSystem=true, KmsKeyId=48c2a546-1e0d-4975-aaba-283347cad5e2
-
 ![restore_job_completed](image-26.png)
 
-→ 📸 Insert screenshot: screenshots/mh3_restored_data_verified.png (data read from RESTORED EFS fs-0cbed9b73103297c1 — confirming data integrity)
+restore data: 
+![mh3_restored_data_verified](image-35.png)
 
 ---
 
@@ -356,13 +357,11 @@ VPC Flow Logs capture rejected traffic, proving security groups are blocking una
 **8b. MH2 — Firewall Blocked Request:**
 
 A request to a non-allowlisted domain is dropped by Network Firewall. Visible in Alert Logs.
-
-→ 📸 Insert screenshot: screenshots/neg_mh2_blocked.png (Network Firewall Alert Log showing dropped/blocked request)
+![mh2_blocked_request_alert](image-7.png)
 
 **8c. MH3 — EFS Mount Target SG Restriction:**
 
 EFS mount target Security Group only allows TCP 2049 from ECS task SG. Connection from any other source is rejected.
-
 ![neg_mh3_efs_sg](image-24.png)
 
 **8d. MH4 — API Gateway 401/403 Rejection:**
