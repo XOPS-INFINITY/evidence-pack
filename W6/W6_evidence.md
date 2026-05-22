@@ -48,7 +48,6 @@
 
 ### 2.2. Tag verification trên resources
 
-#### 📸 Screenshot 2.2.1: Tags trên 3 loại resource khác nhau
 
 **📍 Navigation 1 — Tag trên ECS Service:**
 1. Mở: https://us-west-2.console.aws.amazon.com/ecs/v2/clusters/foodiedash-cluster/services
@@ -99,15 +98,12 @@
 | 2 | **DocumentDB** | ~$2.25/day | ~20% | 2 instances (primary + replica) `db.t3.medium` |
 | 3 | **EC2-Other** | ~$0.46/day | ~5% | Chi phí do dev test và không tắt EC2. |
 
-#### 📸 Screenshot 2.5: Cost Explorer Service Breakdown
-
 **📍 Navigation:**
 1. Cùng Cost Explorer view
 2. **Group by**: Service (thay vì tag)
 3. Date Range: Last 7 days
 4. **View**: Stacked bar
 
-⬇️ `docs/screenshots/W6/2-5-cost-by-service.png`
 
 ### 2.6. AWS Budgets configured
 
@@ -181,7 +177,6 @@ def stop_rds_clusters():
 
 **Note design choice:** Logic `Environment=dev OR no Owner` thay vì `keep=true` (spec gợi ý) — phù hợp hơn với governance pattern hiện tại của team. Cùng intent: phân biệt 'production-keep' vs 'dev-stoppable'.
 
-#### 📸 Screenshot 3.2: Lambda code view
 
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/lambda/home?region=us-west-2#/functions/FoodieDash-AutoStop?tab=code
@@ -201,7 +196,6 @@ def stop_rds_clusters():
 | StartStopResources | `ecs:UpdateService`, `rds:StopDBCluster`, `rds:StartDBCluster` |
 | Logging | `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents` |
 
-#### 📸 Screenshot 3.3: IAM inline policy
 
 **📍 Navigation:**
 1. Mở: https://us-east-1.console.aws.amazon.com/iam/home#/roles/details/FoodieDash-CostControl-Role
@@ -227,7 +221,6 @@ Cron:    cron(30 0 * * ? *)    # 00:30 UTC = 07:30 ICT
 Target:  FoodieDash-AutoStart
 ```
 
-#### 📸 Screenshot 3.4: EventBridge rules
 
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/events/home?region=us-west-2#/rules
@@ -265,14 +258,11 @@ $ aws sns publish --topic-arn arn:aws:sns:us-west-2:297773874485:Budget-Alert-To
 
 **Kết quả:** SNS publish → Lambda fire → ECS service stopped → CloudTrail UpdateService event (xem Section 3.5).
 
-#### 📸 Screenshot 3.6: SNS subscription
-
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/sns/v3/home?region=us-west-2#/topic/arn:aws:sns:us-west-2:297773874485:Budget-Alert-Topic
 2. Tab **Subscriptions** (mặc định)
 ![sns](image-13.png)
 
-#### 📸 Screenshot 3.6.2: Budget configuration
 
 **📍 Navigation:**
 1. Mở: https://us-east-1.console.aws.amazon.com/billing/home?region=us-west-2#/budgets/details?budgetId=foodiedash-w6-daily-150
@@ -458,8 +448,6 @@ Task Definition `foodiedash-be:3` có 2 containers:
 - Mỗi 60s collect CPU/memory metrics
 - Push lên namespace `CWAgent` qua API `PutMetricData`
 
-#### 📸 Screenshot 4.4: Task Definition revision 3
-
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/ecs/v2/task-definitions/foodiedash-be/3/containers?region=us-west-2
 2. Hoặc: ECS → Task Definitions → `foodiedash-be`
@@ -476,7 +464,6 @@ Task Definition `foodiedash-be:3` có 2 containers:
 - **State:** ✅ OK (transitioned from INSUFFICIENT_DATA at 2026-05-22 01:11:20 ICT)
 - **Reason:** Last data point 672ms < 2000ms threshold
 
-#### 📸 Screenshot 4.5: Alarm details
 
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#alarmsV2:alarm/High-API-Latency-Alarm
@@ -503,7 +490,6 @@ fields @timestamp, @message
 | limit 20
 ```
 
-#### 📸 Screenshot 4.6: Log Insights with results
 
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:logs-insights
@@ -517,9 +503,8 @@ fields @timestamp, @message
 ![log](image-39.png)
 ![log](image-40.png)
 ![query](image-41.png)
-![query](image-42.png)
-
-
+![query](image-46.png)
+![query](image-47.png)
 ---
 
 ## Section 5 — MH-SEC: Self-Healing Security Guard
@@ -602,8 +587,6 @@ def lambda_handler(event, context):
     return {"status": "success"}
 ```
 
-#### 📸 Screenshot 5.3: Lambda code
-
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/lambda/home?region=us-west-2#/functions/FoodieDash-Security-Healer?tab=code
 2. Tab **Code**
@@ -640,7 +623,6 @@ def lambda_handler(event, context):
 
 **Target:** `FoodieDash-Security-Healer` Lambda
 
-#### 📸 Screenshot 5.5: EventBridge rule pattern
 
 **📍 Navigation:**
 1. Mở: https://us-west-2.console.aws.amazon.com/events/home?region=us-west-2#/eventbus/default/rules/Detect-S3-Public-Leak
@@ -650,45 +632,6 @@ def lambda_handler(event, context):
 
 ### 5.6. Demonstrated Heal Loop — BEFORE / AFTER + CloudTrail
 
-**Đã chạy live demo lúc 2026-05-22 00:28:17 ICT:**
-
-| Time (ICT) | Action | By |
-|---|---|---|
-| 00:28:17 | DeleteBucketPublicAccessBlock (attack) | Participant (manual CLI) |
-| 00:28:27 | PutBucketPublicAccessBlock (heal) | FoodieDash-Security-Healer (10s latency) |
-| 00:28:36 | Self-trigger detected → ignored | FoodieDash-Security-Healer (anti-loop) |
-
-**Lambda log evidence:**
-```
-[WARNING] CẢNH BÁO: Bucket foodie-knowledgebase vừa bị tắt lá chắn Public Access. Đang tự động bật lại...
-[INFO]    Đã bật lại Block Public Access thành công cho foodie-knowledgebase
-[INFO]    Bỏ qua vì đây là hành động sửa lỗi của chính Lambda.   ← anti-loop kick in
-```
-
-#### 📸 Screenshot 5.6.1: BEFORE — bucket BPA disabled
-
-**Cách reproduce demo để chụp:**
-
-```bash
-# 1. Verify BPA hiện tại (phải có 4 settings ON)
-aws s3api get-public-access-block --bucket foodie-knowledgebase
-
-# 2. Disable BPA (giả vờ attack)
-aws s3api delete-public-access-block --bucket foodie-knowledgebase
-
-# 3. CHỤP NGAY (trong 5-10 giây trước khi Healer fire):
-aws s3api get-public-access-block --bucket foodie-knowledgebase
-# Sẽ thấy NoSuchPublicAccessBlockConfiguration error → BPA bị disable
-
-# 4. Đợi 15 giây
-sleep 15
-
-# 5. CHỤP SAU - BPA tự được restore:
-aws s3api get-public-access-block --bucket foodie-knowledgebase
-# Sẽ thấy 4 settings = true again
-```
-
-**📍 Console Navigation cho screenshot:**
 
 **BEFORE (attack moment):**
 1. Trước khi chạy `delete-public-access-block`, mở: https://us-east-1.console.aws.amazon.com/s3/buckets/foodie-knowledgebase?region=us-west-2&tab=permissions
@@ -900,7 +843,7 @@ Security-Healer code check `userIdentity.arn` để skip event do chính Lambda 
 | `XOPS_BE/lambda/cost-control/` | AutoStop + AutoStart Lambda code |
 | `XOPS_BE/lambda/security-healer/` | Self-Healing Security Lambda code |
 | `XOPS_BE/lambda/api-canary/` | Canary Lambda code |
-| `docs/screenshots/W6/` | All screenshots referenced above |
+
 
 ---
 
@@ -938,39 +881,3 @@ aws s3api get-public-access-block --bucket foodie-knowledgebase   # Should be re
 # aws docdb start-db-cluster --db-cluster-identifier foodiedash-docdb-cluster
 # aws ecs update-service --cluster foodiedash-cluster --service foodiedash-service --desired-count 1
 ```
-
----
-
-## ✅ Completion Checklist (đánh dấu trước khi nộp)
-
-- [ ] Section 1 Cover — điền tên members + GitHub repo URL
-- [ ] 2.2.1 ECS tags screenshot
-- [ ] 2.2.2 DocDB tags screenshot
-- [ ] 2.2.3 S3 tags screenshot
-- [ ] 2.3 Cost allocation tags activated screenshot
-- [ ] 2.4 Cost Explorer filter by tag screenshot
-- [ ] 2.5 Cost by Service breakdown screenshot
-- [ ] 2.6 Budget list screenshot
-- [ ] 3.2 AutoStop code screenshot
-- [ ] 3.3 IAM least-privilege screenshot
-- [ ] 3.4 EventBridge rules list screenshot
-- [ ] 3.5.1 CloudTrail StopDBCluster events screenshot
-- [ ] 3.5.2 CloudTrail event detail screenshot
-- [ ] 3.5.3 CloudTrail UpdateService screenshot
-- [ ] 3.6 SNS subscription screenshot
-- [ ] 3.6.2 Budget config screenshot
-- [ ] 4.2 Dashboard full screenshot
-- [ ] 4.4 Task Definition rev 3 screenshot
-- [ ] 4.5 Alarm OK state screenshot
-- [ ] 4.6 Log Insights with results screenshot
-- [ ] 5.3 Healer Lambda code screenshot
-- [ ] 5.4 Healer IAM least-privilege screenshot
-- [ ] 5.5 EventBridge rule pattern screenshot
-- [ ] 5.6.1 BPA before attack screenshot (chụp ngay sau delete-public-access-block)
-- [ ] 5.6.2 BPA after heal screenshot (chụp 15-30s sau attack)
-- [ ] 5.6.3 CloudTrail PutPublicAccessBlock screenshot
-- [ ] 5.6.4 Security-Healer logs screenshot
-- [ ] 5.7 S3 BPA all-on screenshot
-- [ ] Section 6 — verify project recap accurate
-- [ ] Push commit to GitHub
-- [ ] Post commit link to trainer Slack channel before present slot
