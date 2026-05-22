@@ -794,26 +794,33 @@ $ aws cloudwatch describe-alarms --alarm-names FoodieDash-Critical-Composite-Ala
 
 --- 
 
-### 7.1. CloudWatch Agent on Fargate via Sidecar (Innovation)
+# 7.1. CloudWatch Agent trên Fargate với Sidecar (Innovation)
 
-**Not in spec but elegant solution to a constraint:**
+**Không nằm trong yêu cầu spec nhưng là giải pháp tinh tế cho một ràng buộc:**
 
-Spec gợi ý "install CloudWatch Agent" — pattern assume EC2. Trên Fargate (no-OS), chúng tôi implement:
+Spec đề xuất "cài đặt CloudWatch Agent" — mẫu giả định EC2. Trên Fargate (không có OS), chúng tôi triển khai:
 
-- CWAgent dạng sidecar container trong cùng ECS task
-- `pidMode: "task"` ở task-level cho phép chung PID namespace
-- Plugin `procstat` monitor `exe=node` process từ sidecar
-- Push metrics lên `CWAgent` namespace native
+- CWAgent dưới dạng container sidecar trong cùng task ECS
+- `pidMode: "task"` ở mức task cho phép chia sẻ PID namespace
+- Plugin `procstat` giám sát quá trình `exe=node` từ sidecar
+- Đẩy metric lên namespace gốc `CWAgent`
+![image-45.png](image-45.png)
 
-**Bonus value:** Demonstrates deep understanding of Fargate vs EC2 observability patterns, and how to retrofit AWS-recommended monitoring on serverless container platforms.
+**Giá trị bonus:** Thể hiện hiểu biết sâu về mẫu quan sát Fargate vs EC2 và cách tích hợp monitoring được AWS khuyến cáo trên nền tảng serverless.
+
+![Terraform plan for anti‑infinite‑loop (Security Healer)](image-46.png)
+
+### Bonus: Terraform Trusted Advisor remediation
+![terraform](image-49.png)
 
 ### 7.2. Anti-Infinite-Loop Pattern in Self-Healing Lambda
 
 Security-Healer code check `userIdentity.arn` để skip event do chính Lambda gây ra. Cách thông thường là configure EventBridge rule chỉ catch `Delete*` events, nhưng:
 - Catch cả `Put` + `Delete` cho phép detect external misconfigurations (someone manually disable then re-enable wrongly)
 - Anti-loop trong code = defense-in-depth
+![anti-loop](image-20.png)
 
-### 7.3. Cost Discipline Story (Wasteful → Changed) — Bonus +0.25
+### 7.3. Cost Discipline Story (Wasteful → Changed) 
 
 **Reflection (130 words):**
 
@@ -837,9 +844,7 @@ Security-Healer code check `userIdentity.arn` để skip event do chính Lambda 
 | File | Purpose |
 |---|---|
 | `W6/W6_evidence.md` | This file — Evidence Pack |
-| `docs/W6_overnight_run_report.md` | Detailed run log of W6 autonomous setup |
 | `W5/W5_evidence.md` | W5 Evidence Pack reference |
-| `terraform/` | Infrastructure as Code |
 | `XOPS_BE/lambda/cost-control/` | AutoStop + AutoStart Lambda code |
 | `XOPS_BE/lambda/security-healer/` | Self-Healing Security Lambda code |
 | `XOPS_BE/lambda/api-canary/` | Canary Lambda code |
