@@ -1,0 +1,1026 @@
+%PDF-1.4
+% StudyBot generated sample
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R 25 0 R 27 0 R 29 0 R 31 0 R 33 0 R 35 0 R 37 0 R 39 0 R 41 0 R 43 0 R 45 0 R 47 0 R 49 0 R 51 0 R 53 0 R 55 0 R 57 0 R 59 0 R 61 0 R 63 0 R 65 0 R 67 0 R 69 0 R 71 0 R 73 0 R 75 0 R 77 0 R 79 0 R 81 0 R 83 0 R] /Count 40 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 408 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 1: AI Study Buddy: Document Intelligence) Tj
+/F1 13 Tf
+0 -24 Td
+( - Learning objective: turn lecture slides into grounded study aids.) Tj
+0 -24 Td
+( - Key pipeline: upload, extract, chunk, retrieve, generate, cite.) Tj
+0 -24 Td
+( - Most testable idea: retrieval quality depends on extraction quality.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 1 of 40) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 413 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 2: Why Students Need Grounded AI) Tj
+/F1 13 Tf
+0 -24 Td
+( - Students ask local questions about their own notes, not generic web facts.) Tj
+0 -24 Td
+( - A useful study buddy must answer with citations to the uploaded material.) Tj
+0 -24 Td
+( - Risk: fluent answers without evidence create false confidence.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 2 of 40) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 390 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 3: System Architecture) Tj
+/F1 13 Tf
+0 -24 Td
+( - Frontend sends PDF/TXT/MD uploads to a FastAPI backend.) Tj
+0 -24 Td
+( - Backend stores the file, extracts text, chunks notes, and indexes chunks.) Tj
+0 -24 Td
+( - The AI model receives retrieved context and returns grounded output.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 3 of 40) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 414 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 4: Document Extraction Challenge) Tj
+/F1 13 Tf
+0 -24 Td
+( - PDF slides can contain text layers, scanned images, tables, code, and figures.) Tj
+0 -24 Td
+( - A single extractor is rarely optimal for every deck.) Tj
+0 -24 Td
+( - Measured text density helps choose between cheap and expensive extraction paths.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 4 of 40) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 417 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 5: Hybrid Extraction Decision) Tj
+/F1 13 Tf
+0 -24 Td
+( - Path A: pypdf handles normal text PDFs with low cost and low latency.) Tj
+0 -24 Td
+( - Path B: Textract or vision fallback handles low text-density scanned pages.) Tj
+0 -24 Td
+( - Decision rule: fallback when extracted characters per page is below 100.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 5 of 40) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 450 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 6: Table: Extraction Path Trade-Off) Tj
+/F1 13 Tf
+0 -24 Td
+( - Path | Wins | Loses) Tj
+0 -24 Td
+( - pypdf | pure-text PDFs and Lambda-friendly runtime | weak image/table awareness) Tj
+0 -24 Td
+( - Textract | scanned documents and tables | higher cost per page) Tj
+0 -24 Td
+( - Vision model | figures and diagrams | high latency and token cost) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 6 of 40) Tj
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Length 390 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 7: Chunking Strategy) Tj
+/F1 13 Tf
+0 -24 Td
+( - Current chunking uses slide-aware boundaries when Slide N markers exist.) Tj
+0 -24 Td
+( - Fallback chunking uses sentence boundaries around a target size.) Tj
+0 -24 Td
+( - Chosen default: 700 characters balances context and precision.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 7 of 40) Tj
+ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 16 0 R >>
+endobj
+18 0 obj
+<< /Length 385 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 8: Why Chunk Size Matters) Tj
+/F1 13 Tf
+0 -24 Td
+( - Small chunks improve precision but can lose definitions and examples.) Tj
+0 -24 Td
+( - Large chunks preserve context but can dilute retrieval relevance.) Tj
+0 -24 Td
+( - A good chunk should map to how students ask questions.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 8 of 40) Tj
+ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 18 0 R >>
+endobj
+20 0 obj
+<< /Length 384 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 9: Retrieval Quality Metric) Tj
+/F1 13 Tf
+0 -24 Td
+( - Precision@k measures how many returned citations are relevant.) Tj
+0 -24 Td
+( - StudyBot readiness uses five probe questions and precision@3.) Tj
+0 -24 Td
+( - Target threshold: at least 0.80 on the sample lecture content.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 9 of 40) Tj
+ET
+endstream
+endobj
+21 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 20 0 R >>
+endobj
+22 0 obj
+<< /Length 432 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 10: Probe Questions) Tj
+/F1 13 Tf
+0 -24 Td
+( - Probe 1: What does backpropagation compute?) Tj
+0 -24 Td
+( - Probe 2: What does a confusion matrix compare?) Tj
+0 -24 Td
+( - Probe 3: Why are activation functions used?) Tj
+0 -24 Td
+( - Probe 4: What is overfitting?) Tj
+0 -24 Td
+( - Probe 5: Why does the learning rate matter?) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 10 of 40) Tj
+ET
+endstream
+endobj
+23 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 22 0 R >>
+endobj
+24 0 obj
+<< /Length 385 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 11: Backpropagation) Tj
+/F1 13 Tf
+0 -24 Td
+( - Backpropagation computes gradients for each model weight.) Tj
+0 -24 Td
+( - Gradients tell the optimizer how to reduce prediction error.) Tj
+0 -24 Td
+( - This is testable because it connects loss, gradients, and parameter updates.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 11 of 40) Tj
+ET
+endstream
+endobj
+25 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 24 0 R >>
+endobj
+26 0 obj
+<< /Length 372 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 12: Gradient Descent) Tj
+/F1 13 Tf
+0 -24 Td
+( - Gradient descent updates parameters in the opposite direction of the gradient.) Tj
+0 -24 Td
+( - The update size is controlled by the learning rate.) Tj
+0 -24 Td
+( - Too large can diverge; too small can train slowly.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 12 of 40) Tj
+ET
+endstream
+endobj
+27 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 26 0 R >>
+endobj
+28 0 obj
+<< /Length 376 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 13: Learning Rate) Tj
+/F1 13 Tf
+0 -24 Td
+( - The learning rate controls the size of optimizer updates.) Tj
+0 -24 Td
+( - Large values can overshoot minima, while tiny values slow convergence.) Tj
+0 -24 Td
+( - Schedulers reduce the learning rate as training progresses.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 13 of 40) Tj
+ET
+endstream
+endobj
+29 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 28 0 R >>
+endobj
+30 0 obj
+<< /Length 367 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 14: Activation Functions) Tj
+/F1 13 Tf
+0 -24 Td
+( - Activation functions add non-linearity to neural networks.) Tj
+0 -24 Td
+( - Without activations, stacked layers collapse into a linear model.) Tj
+0 -24 Td
+( - Examples include ReLU, sigmoid, tanh, and GELU.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 14 of 40) Tj
+ET
+endstream
+endobj
+31 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 30 0 R >>
+endobj
+32 0 obj
+<< /Length 396 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 15: Overfitting) Tj
+/F1 13 Tf
+0 -24 Td
+( - Overfitting happens when a model memorizes training examples.) Tj
+0 -24 Td
+( - A model that overfits performs poorly on unseen validation data.) Tj
+0 -24 Td
+( - Mitigations include regularization, dropout, data augmentation, and early stopping.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 15 of 40) Tj
+ET
+endstream
+endobj
+33 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 32 0 R >>
+endobj
+34 0 obj
+<< /Length 358 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 16: Validation Data) Tj
+/F1 13 Tf
+0 -24 Td
+( - Validation data estimates generalization before final testing.) Tj
+0 -24 Td
+( - It should not be used to train weights directly.) Tj
+0 -24 Td
+( - Repeated tuning on validation data can leak information.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 16 of 40) Tj
+ET
+endstream
+endobj
+35 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 34 0 R >>
+endobj
+36 0 obj
+<< /Length 385 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 17: Confusion Matrix) Tj
+/F1 13 Tf
+0 -24 Td
+( - A confusion matrix compares predicted labels with actual labels.) Tj
+0 -24 Td
+( - Rows and columns expose true positives, false positives, and false negatives.) Tj
+0 -24 Td
+( - This is useful for imbalanced classification tasks.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 17 of 40) Tj
+ET
+endstream
+endobj
+37 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 36 0 R >>
+endobj
+38 0 obj
+<< /Length 473 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 18: Table: Classification Metrics) Tj
+/F1 13 Tf
+0 -24 Td
+( - Metric | Definition | Interpretation) Tj
+0 -24 Td
+( - Precision | true positives divided by predicted positives | false alarm control) Tj
+0 -24 Td
+( - Recall | true positives divided by actual positives | missed case control) Tj
+0 -24 Td
+( - F1 | harmonic mean of precision and recall | balanced summary) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 18 of 40) Tj
+ET
+endstream
+endobj
+39 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 38 0 R >>
+endobj
+40 0 obj
+<< /Length 386 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 19: Figure Caption: Training Curves) Tj
+/F1 13 Tf
+0 -24 Td
+( - Figure 1 shows training loss decreasing across epochs.) Tj
+0 -24 Td
+( - Validation loss decreases at first and rises after epoch six.) Tj
+0 -24 Td
+( - Caption insight: the rise suggests overfitting after epoch six.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 19 of 40) Tj
+ET
+endstream
+endobj
+41 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 40 0 R >>
+endobj
+42 0 obj
+<< /Length 430 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 20: Equation: Cross Entropy) Tj
+/F1 13 Tf
+0 -24 Td
+( - Cross entropy equals the negative sum of target probability times log predicted probability.) Tj
+0 -24 Td
+( - For one-hot labels, only the correct class term remains.) Tj
+0 -24 Td
+( - Lower cross entropy means the model assigns more probability to the correct class.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 20 of 40) Tj
+ET
+endstream
+endobj
+43 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 42 0 R >>
+endobj
+44 0 obj
+<< /Length 384 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 21: Code Block: Training Step) Tj
+/F1 13 Tf
+0 -24 Td
+( - pseudo-code: loss.backward computes gradients.) Tj
+0 -24 Td
+( - pseudo-code: optimizer.step applies gradients to parameters.) Tj
+0 -24 Td
+( - pseudo-code: optimizer.zero_grad clears old gradients before the next batch.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 21 of 40) Tj
+ET
+endstream
+endobj
+45 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 44 0 R >>
+endobj
+46 0 obj
+<< /Length 348 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 22: Embeddings) Tj
+/F1 13 Tf
+0 -24 Td
+( - Embeddings convert text chunks into numeric vectors.) Tj
+0 -24 Td
+( - Similar meanings should produce nearby vectors in embedding space.) Tj
+0 -24 Td
+( - Embedding quality limits retrieval quality.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 22 of 40) Tj
+ET
+endstream
+endobj
+47 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 46 0 R >>
+endobj
+48 0 obj
+<< /Length 361 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 23: RAG Flow) Tj
+/F1 13 Tf
+0 -24 Td
+( - Retrieval augmented generation first searches uploaded chunks.) Tj
+0 -24 Td
+( - The prompt includes retrieved context plus the student question.) Tj
+0 -24 Td
+( - The answer should cite retrieved chunks or slides.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 23 of 40) Tj
+ET
+endstream
+endobj
+49 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 48 0 R >>
+endobj
+50 0 obj
+<< /Length 369 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 24: Citation Granularity) Tj
+/F1 13 Tf
+0 -24 Td
+( - Students expect citations at slide-level granularity.) Tj
+0 -24 Td
+( - Chunk-only citations are acceptable for a prototype but less precise.) Tj
+0 -24 Td
+( - Slide-aware metadata improves trust and debugging.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 24 of 40) Tj
+ET
+endstream
+endobj
+51 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 50 0 R >>
+endobj
+52 0 obj
+<< /Length 390 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 25: Prompt Engineering) Tj
+/F1 13 Tf
+0 -24 Td
+( - Prompts should instruct the model to use only retrieved lecture notes.) Tj
+0 -24 Td
+( - The model should admit when context does not contain the answer.) Tj
+0 -24 Td
+( - JSON prompts help generate structured quizzes and flashcards.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 25 of 40) Tj
+ET
+endstream
+endobj
+53 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 52 0 R >>
+endobj
+54 0 obj
+<< /Length 367 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 26: Study Guide Output) Tj
+/F1 13 Tf
+0 -24 Td
+( - A one-page summary should be concise and exam-oriented.) Tj
+0 -24 Td
+( - The five most testable concepts should include why each is testable.) Tj
+0 -24 Td
+( - The guide should avoid unsupported outside facts.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 26 of 40) Tj
+ET
+endstream
+endobj
+55 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 54 0 R >>
+endobj
+56 0 obj
+<< /Length 395 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 27: Flashcards) Tj
+/F1 13 Tf
+0 -24 Td
+( - Flashcards are best for definitions, contrasts, and short causal explanations.) Tj
+0 -24 Td
+( - Each card should have one clear question and one focused answer.) Tj
+0 -24 Td
+( - Deck quality depends on extracting key concepts from lecture text.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 27 of 40) Tj
+ET
+endstream
+endobj
+57 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 56 0 R >>
+endobj
+58 0 obj
+<< /Length 389 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 28: Quiz Generation) Tj
+/F1 13 Tf
+0 -24 Td
+( - A multiple-choice quiz should include four plausible options.) Tj
+0 -24 Td
+( - The correct option index and explanation must be stored with each question.) Tj
+0 -24 Td
+( - Good distractors test misconceptions instead of random facts.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 28 of 40) Tj
+ET
+endstream
+endobj
+59 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 58 0 R >>
+endobj
+60 0 obj
+<< /Length 414 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 29: Dashboard Tracking) Tj
+/F1 13 Tf
+0 -24 Td
+( - A weekly dashboard tracks which topics the learner studied this week.) Tj
+0 -24 Td
+( - Signals include uploaded documents, asked questions, flashcards, and quizzes.) Tj
+0 -24 Td
+( - Topic extraction from queries gives a lightweight personal study history.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 29 of 40) Tj
+ET
+endstream
+endobj
+61 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 60 0 R >>
+endobj
+62 0 obj
+<< /Length 348 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 30: Failure Mode) Tj
+/F1 13 Tf
+0 -24 Td
+( - Broken query: what is slide 12 about?) Tj
+0 -24 Td
+( - Cause: fixed-size chunks can cut across slide boundaries.) Tj
+0 -24 Td
+( - Mitigation: slide-aware chunking keeps Slide N sections together.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 30 of 40) Tj
+ET
+endstream
+endobj
+63 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 62 0 R >>
+endobj
+64 0 obj
+<< /Length 392 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 31: Cost Awareness) Tj
+/F1 13 Tf
+0 -24 Td
+( - Using Textract for every text PDF overpays for easy documents.) Tj
+0 -24 Td
+( - Using pypdf first saves cost when the text layer is already available.) Tj
+0 -24 Td
+( - Fallback only when text density is low is a defensible hybrid design.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 31 of 40) Tj
+ET
+endstream
+endobj
+65 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 64 0 R >>
+endobj
+66 0 obj
+<< /Length 414 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 32: Security and Privacy) Tj
+/F1 13 Tf
+0 -24 Td
+( - Lecture notes may contain private class material.) Tj
+0 -24 Td
+( - User isolation prevents one student's documents from appearing for another user.) Tj
+0 -24 Td
+( - Production deployments should enforce authentication and least privilege storage access.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 32 of 40) Tj
+ET
+endstream
+endobj
+67 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 66 0 R >>
+endobj
+68 0 obj
+<< /Length 386 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 33: Production Vector Store) Tj
+/F1 13 Tf
+0 -24 Td
+( - The local vector store is useful for demos but does not scale.) Tj
+0 -24 Td
+( - Production can use Bedrock Knowledge Bases or OpenSearch Serverless.) Tj
+0 -24 Td
+( - Metadata filters should include user_id and document_id.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 33 of 40) Tj
+ET
+endstream
+endobj
+69 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 68 0 R >>
+endobj
+70 0 obj
+<< /Length 446 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 34: Evaluation Table) Tj
+/F1 13 Tf
+0 -24 Td
+( - Criterion | Evidence | Current readiness) Tj
+0 -24 Td
+( - Summary | one-page guide plus five concepts | implemented) Tj
+0 -24 Td
+( - Quiz | ten MCQ questions | implemented) Tj
+0 -24 Td
+( - Dashboard | weekly activity | implemented) Tj
+0 -24 Td
+( - Retrieval | precision@3 probes | measured) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 34 of 40) Tj
+ET
+endstream
+endobj
+71 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 70 0 R >>
+endobj
+72 0 obj
+<< /Length 427 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 35: Demo Script) Tj
+/F1 13 Tf
+0 -24 Td
+( - Step 1: upload this 40-slide PDF.) Tj
+0 -24 Td
+( - Step 2: generate a study guide and inspect the five testable concepts.) Tj
+0 -24 Td
+( - Step 3: ask about confusion matrices and verify citations.) Tj
+0 -24 Td
+( - Step 4: generate a ten-question quiz and open the dashboard.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 35 of 40) Tj
+ET
+endstream
+endobj
+73 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 72 0 R >>
+endobj
+74 0 obj
+<< /Length 303 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 36: Most Testable Concept 1) Tj
+/F1 13 Tf
+0 -24 Td
+( - Backpropagation computes gradients used by optimizers.) Tj
+0 -24 Td
+( - Why testable: it is a central mechanism in neural network training.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 36 of 40) Tj
+ET
+endstream
+endobj
+75 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 74 0 R >>
+endobj
+76 0 obj
+<< /Length 297 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 37: Most Testable Concept 2) Tj
+/F1 13 Tf
+0 -24 Td
+( - Learning rate controls optimizer update size.) Tj
+0 -24 Td
+( - Why testable: it explains convergence, divergence, and training speed.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 37 of 40) Tj
+ET
+endstream
+endobj
+77 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 76 0 R >>
+endobj
+78 0 obj
+<< /Length 319 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 38: Most Testable Concept 3) Tj
+/F1 13 Tf
+0 -24 Td
+( - Confusion matrices compare predicted labels with actual labels.) Tj
+0 -24 Td
+( - Why testable: it supports precision, recall, and error analysis questions.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 38 of 40) Tj
+ET
+endstream
+endobj
+79 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 78 0 R >>
+endobj
+80 0 obj
+<< /Length 322 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 39: Most Testable Concept 4) Tj
+/F1 13 Tf
+0 -24 Td
+( - Overfitting means memorizing training data and failing to generalize.) Tj
+0 -24 Td
+( - Why testable: it connects validation curves with mitigation strategies.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 39 of 40) Tj
+ET
+endstream
+endobj
+81 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 80 0 R >>
+endobj
+82 0 obj
+<< /Length 331 >>
+stream
+BT
+/F1 22 Tf
+72 730 Td
+(Slide 40: Most Testable Concept 5) Tj
+/F1 13 Tf
+0 -24 Td
+( - Hybrid extraction uses text density to choose pypdf or fallback OCR/vision.) Tj
+0 -24 Td
+( - Why testable: it shows architectural judgment and cost-quality trade-offs.) Tj
+/F1 10 Tf
+0 -48 Td
+(StudyBot W7 sample lecture PDF | page 40 of 40) Tj
+ET
+endstream
+endobj
+83 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 82 0 R >>
+endobj
+xref
+0 84
+0000000000 65535 f 
+0000000037 00000 n 
+0000000086 00000 n 
+0000000415 00000 n 
+0000000485 00000 n 
+0000000943 00000 n 
+0000001069 00000 n 
+0000001532 00000 n 
+0000001658 00000 n 
+0000002098 00000 n 
+0000002224 00000 n 
+0000002689 00000 n 
+0000002817 00000 n 
+0000003285 00000 n 
+0000003413 00000 n 
+0000003914 00000 n 
+0000004042 00000 n 
+0000004483 00000 n 
+0000004611 00000 n 
+0000005047 00000 n 
+0000005175 00000 n 
+0000005610 00000 n 
+0000005738 00000 n 
+0000006221 00000 n 
+0000006349 00000 n 
+0000006785 00000 n 
+0000006913 00000 n 
+0000007336 00000 n 
+0000007464 00000 n 
+0000007891 00000 n 
+0000008019 00000 n 
+0000008437 00000 n 
+0000008565 00000 n 
+0000009012 00000 n 
+0000009140 00000 n 
+0000009549 00000 n 
+0000009677 00000 n 
+0000010113 00000 n 
+0000010241 00000 n 
+0000010765 00000 n 
+0000010893 00000 n 
+0000011330 00000 n 
+0000011458 00000 n 
+0000011939 00000 n 
+0000012067 00000 n 
+0000012502 00000 n 
+0000012630 00000 n 
+0000013029 00000 n 
+0000013157 00000 n 
+0000013569 00000 n 
+0000013697 00000 n 
+0000014117 00000 n 
+0000014245 00000 n 
+0000014686 00000 n 
+0000014814 00000 n 
+0000015232 00000 n 
+0000015360 00000 n 
+0000015806 00000 n 
+0000015934 00000 n 
+0000016374 00000 n 
+0000016502 00000 n 
+0000016967 00000 n 
+0000017095 00000 n 
+0000017494 00000 n 
+0000017622 00000 n 
+0000018065 00000 n 
+0000018193 00000 n 
+0000018658 00000 n 
+0000018786 00000 n 
+0000019223 00000 n 
+0000019351 00000 n 
+0000019848 00000 n 
+0000019976 00000 n 
+0000020454 00000 n 
+0000020582 00000 n 
+0000020936 00000 n 
+0000021064 00000 n 
+0000021412 00000 n 
+0000021540 00000 n 
+0000021910 00000 n 
+0000022038 00000 n 
+0000022411 00000 n 
+0000022539 00000 n 
+0000022921 00000 n 
+trailer
+<< /Size 84 /Root 1 0 R >>
+startxref
+23049
+%%EOF
