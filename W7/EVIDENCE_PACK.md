@@ -373,7 +373,7 @@ demonstrate the Encryption-at-rest area.
 ### CloudWatch dashboard
 
 - Name: `studybot-prod-dashboard`
-- Screenshot: `assets/dashboard.png` [TBD capture]
+- Purpose: provide a quick operational view of the StudyBot backend and a proof point for monitoring capability.
 
 <p align=center>
   <img src=./assets/cloudwatch_dashboard.jpg alt=CloudWatch dashboard width=800/>
@@ -381,9 +381,23 @@ demonstrate the Encryption-at-rest area.
   <em>Hình 23: CloudWatch dashboard widgets for Lambda and API Gateway.</em>
 </p>
 
-- Widgets:
+- Current dashboard widgets:
   - Lambda Errors + Duration (5-min granularity)
   - API Gateway HTTP API request count + 5xx errors
+
+- Why this summary matters:
+  - Lambda widgets show whether the backend is actually running, failing, or being throttled under load.
+  - API Gateway widgets separate client-side request failures from server-side failures, which is critical when debugging upload or question flows.
+  - Together, these widgets support incident diagnosis and give trainer-visible evidence that the app is being monitored end to end.
+
+- Recommended completion set for a stronger dashboard (to fully support Capability #8):
+  - Lambda — Invocations, Errors, Throttles
+  - Lambda — Duration (Avg/P99/Max)
+  - API Gateway — Requests and 5xx errors
+  - DynamoDB — Capacity and throttles
+  - Bedrock — Invocations and latency
+  - StudyBot custom metrics — Uploads, Deletes, Questions; Quiz Questions, Flashcards generated
+  - S3 docs bucket — Objects and size (after enabling S3 request metrics)
 
 ### Alarm
 
