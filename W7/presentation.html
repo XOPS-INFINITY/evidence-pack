@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyBot — AI Study Buddy | G8 Capstone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #FFFFFF;
+  color: #1A1A2E;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ═══════════════════════════════════════════
+   COLOR TOKENS
+   ═══════════════════════════════════════════ */
+:root {
+  --bg: #FFFFFF;
+  --bg-warm: #FFF8F0;
+  --accent: #FF6B2C;
+  --accent-light: #FFB088;
+  --accent-dark: #FF5722;
+  --text: #1A1A2E;
+  --text-sec: #6B7280;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --highlight: #FFF0E6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-orange: 0 8px 32px rgba(255,107,44,0.18);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+
+/* ═══════════════════════════════════════════
+   SLIDE ENGINE
+   ═══════════════════════════════════════════ */
+.deck { position: relative; width: 100vw; height: 100vh; }
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s cubic-bezier(.4,0,.2,1), transform 0.55s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  z-index: 0;
+  overflow-y: auto;
+}
+.slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  z-index: 1;
+}
+.slide.exit-up {
+  opacity: 0;
+  transform: translateY(-18px);
+}
+
+/* ═══════════════════════════════════════════
+   PROGRESS BAR + COUNTER
+   ═══════════════════════════════════════════ */
+#progress-bar {
+  position: fixed;
+  bottom: 0; left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-light), var(--accent), var(--accent-dark));
+  border-radius: 0 4px 0 0;
+  transition: width 0.45s cubic-bezier(.4,0,.2,1);
+  z-index: 999;
+}
+#slide-counter {
+  position: fixed;
+  bottom: 16px; right: 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-sec);
+  z-index: 999;
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+#nav-hint {
+  position: fixed;
+  bottom: 14px; left: 28px;
+  font-size: 12px;
+  color: #bbb;
+  z-index: 999;
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════ */
+.slide-title {
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.slide-subtitle {
+  font-size: clamp(15px, 1.6vw, 20px);
+  font-weight: 500;
+  color: var(--text-sec);
+  margin-bottom: 36px;
+}
+.accent { color: var(--accent); }
+.accent-bg {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT HELPERS
+   ═══════════════════════════════════════════ */
+.row { display: flex; gap: 24px; width: 100%; justify-content: center; flex-wrap: wrap; }
+.col { flex: 1; min-width: 240px; }
+.center-col { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.w100 { width: 100%; max-width: 1100px; }
+.mt-auto { margin-top: auto; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+
+/* ═══════════════════════════════════════════
+   CARDS
+   ═══════════════════════════════════════════ */
+.card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.card-orange-border { border-left: 4px solid var(--accent); }
+.card-green { background: linear-gradient(135deg, #ECFDF5, #D1FAE5); border: 1px solid #A7F3D0; }
+.card-red { background: linear-gradient(135deg, #FFF5F0, #FFE8D6); border: 1px solid #FFCBA4; }
+.card-yellow { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border: 1px solid #FDE68A; }
+.card .emoji { font-size: 32px; margin-bottom: 12px; display: block; }
+.card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.card p, .card li { font-size: 14px; color: var(--text-sec); line-height: 1.65; }
+.card ul { padding-left: 18px; }
+.card ul li { margin-bottom: 4px; }
+
+/* ═══════════════════════════════════════════
+   TABLES
+   ═══════════════════════════════════════════ */
+.styled-table {
+  width: 100%;
+  max-width: 1050px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.styled-table thead th {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.styled-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #F3F4F6;
+  vertical-align: middle;
+}
+.styled-table tbody tr:nth-child(even) { background: var(--bg-warm); }
+.styled-table tbody tr:hover { background: var(--highlight); }
+.styled-table tbody tr td:first-child {
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  width: 36px;
+}
+.chosen { color: var(--success) !important; font-weight: 600; }
+.rejected { color: #9CA3AF; }
+
+/* ═══════════════════════════════════════════
+   PIPELINE / FLOW
+   ═══════════════════════════════════════════ */
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  max-width: 1050px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.pipe-step {
+  background: var(--bg);
+  border: 2px solid var(--highlight);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  min-width: 180px;
+  max-width: 280px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  flex: 1;
+}
+.pipe-step .emoji { font-size: 28px; margin-bottom: 8px; display: block; }
+.pipe-step h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.pipe-step p { font-size: 12px; color: var(--text-sec); line-height: 1.5; }
+.pipe-arrow {
+  font-size: 24px;
+  color: var(--accent);
+  margin: 0 6px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   SPECIAL COMPONENTS
+   ═══════════════════════════════════════════ */
+.big-number {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.big-number-green {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 900;
+  color: var(--success);
+  line-height: 1;
+}
+.highlight-box {
+  background: var(--highlight);
+  border: 2px solid var(--accent-light);
+  border-radius: var(--radius-sm);
+  padding: 16px 24px;
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+  color: var(--text);
+}
+.highlight-box-green {
+  background: #ECFDF5;
+  border: 2px solid #6EE7B7;
+  border-radius: var(--radius-sm);
+  padding: 16px 24px;
+  font-weight: 600;
+  font-size: 15px;
+  text-align: center;
+  color: #065F46;
+}
+.badge {
+  display: inline-block;
+  background: var(--highlight);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin: 4px;
+}
+.badge-green {
+  background: #D1FAE5;
+  color: #065F46;
+}
+.checklist { list-style: none; padding: 0; }
+.checklist li {
+  font-size: 15px;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.checklist .check {
+  width: 24px;
+  height: 24px;
+  background: var(--success);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.checklist .uncheck {
+  width: 24px;
+  height: 24px;
+  background: #E5E7EB;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9CA3AF;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  text-decoration: none;
+  padding: 14px 32px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: var(--shadow-orange);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-link:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 40px rgba(255,107,44,0.3); }
+.link-row { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+.link-item { font-size: 14px; color: var(--text-sec); }
+.link-item a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.link-item a:hover { text-decoration: underline; }
+
+/* ═══════════════════════════════════════════
+   COMPARISON TWO-COL
+   ═══════════════════════════════════════════ */
+.compare-col {
+  flex: 1;
+  min-width: 280px;
+  padding: 28px;
+  border-radius: var(--radius);
+  text-align: center;
+}
+.compare-col.bad { background: #F9FAFB; border: 2px solid #E5E7EB; }
+.compare-col.good { background: #FFF8F0; border: 2px solid var(--accent-light); box-shadow: var(--shadow-orange); }
+.compare-col h3 { font-size: 18px; margin-bottom: 12px; }
+.compare-col p, .compare-col ul { font-size: 14px; color: var(--text-sec); line-height: 1.7; text-align: left; }
+.compare-col ul { padding-left: 18px; }
+
+/* ═══════════════════════════════════════════
+   SLIDE-SPECIFIC: TITLE (#1)
+   ═══════════════════════════════════════════ */
+.slide-cover { background: var(--bg); position: relative; }
+.slide-cover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--accent-light), var(--accent), var(--accent-dark));
+}
+.slide-cover .glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255,107,44,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cover-title {
+  font-size: clamp(52px, 7vw, 90px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.05;
+  margin-bottom: 12px;
+}
+.cover-sub {
+  font-size: clamp(17px, 2vw, 22px);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.cover-tagline {
+  font-size: clamp(14px, 1.4vw, 17px);
+  color: var(--text-sec);
+  font-style: italic;
+  margin-bottom: 32px;
+}
+.cover-team {
+  font-size: 13px;
+  color: var(--text-sec);
+  margin-top: 12px;
+  line-height: 1.8;
+}
+.cover-team .label { font-weight: 700; color: var(--accent); margin-right: 4px; }
+.cover-members {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-top: 6px;
+  max-width: 700px;
+  line-height: 1.7;
+}
+.cover-bottom {
+  position: absolute;
+  bottom: 28px;
+  font-size: 12px;
+  color: #bbb;
+  letter-spacing: 0.5px;
+}
+
+/* slide warm bg */
+.slide-warm { background: var(--bg-warm); }
+
+/* ═══════════════════════════════════════════
+   METRIC STRIP
+   ═══════════════════════════════════════════ */
+.metric-strip {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg);
+  padding: 10px 20px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.metric-item .emoji { font-size: 18px; margin: 0; }
+
+/* spec cards small */
+.spec-cards { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+.spec-card {
+  background: var(--bg-warm);
+  border-radius: var(--radius-xs);
+  padding: 10px 16px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-sec);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.spec-card strong { color: var(--text); }
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255,107,44,0.15); }
+  50% { box-shadow: 0 0 40px rgba(255,107,44,0.3); }
+}
+.slide.active .anim-1 { animation: fadeInUp 0.5s 0.1s both; }
+.slide.active .anim-2 { animation: fadeInUp 0.5s 0.2s both; }
+.slide.active .anim-3 { animation: fadeInUp 0.5s 0.3s both; }
+.slide.active .anim-4 { animation: fadeInUp 0.5s 0.4s both; }
+.slide.active .anim-5 { animation: fadeInUp 0.5s 0.5s both; }
+.slide.active .anim-6 { animation: fadeInUp 0.5s 0.6s both; }
+.slide.active .anim-7 { animation: fadeInUp 0.5s 0.7s both; }
+
+/* ═══════════════════════════════════════════
+   CLOSING SLIDE
+   ═══════════════════════════════════════════ */
+.slide-closing { position: relative; }
+.slide-closing::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--accent-light), var(--accent), var(--accent-dark));
+}
+
+/* quote */
+.quote-block {
+  font-size: clamp(16px, 2vw, 22px);
+  font-style: italic;
+  color: var(--text);
+  max-width: 750px;
+  text-align: center;
+  line-height: 1.6;
+  position: relative;
+  padding: 0 20px;
+  margin-bottom: 32px;
+}
+.quote-block::before {
+  content: '\201C';
+  font-size: 60px;
+  color: var(--accent-light);
+  position: absolute;
+  top: -30px;
+  left: -10px;
+  font-family: Georgia, serif;
+}
+
+/* cost bar */
+.cost-bar-wrap {
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 10px;
+}
+.cost-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.cost-bar-track {
+  width: 100%;
+  height: 20px;
+  background: #F3F4F6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.cost-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+}
+
+/* icons inline */
+.icon-list { list-style: none; padding: 0; }
+.icon-list li {
+  font-size: 14px;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.icon-list .ico { font-size: 20px; flex-shrink: 0; }
+
+/* video embed */
+.video-wrap {
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16/9;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  margin-top: 20px;
+}
+.video-wrap iframe { width: 100%; height: 100%; border: none; }
+
+/* Q&A big */
+.qa-big {
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 900;
+  color: var(--accent);
+  margin-top: 24px;
+  letter-spacing: -1px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .slide { padding: 40px 24px; }
+  .row { gap: 16px; }
+  .card { padding: 20px 16px; }
+  .compare-col { min-width: 100%; }
+  .pipeline { flex-direction: column; align-items: center; }
+  .pipe-arrow { transform: rotate(90deg); margin: 8px 0; }
+}
+
+/* Print */
+@media print {
+  .slide { position: relative; page-break-after: always; opacity: 1 !important; transform: none !important; pointer-events: auto !important; height: 100vh; }
+  #progress-bar, #slide-counter, #nav-hint { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 1 — TITLE / COVER
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-cover" data-slide="1">
+  <div class="glow"></div>
+  <div class="center-col" style="z-index:1">
+    <div class="cover-title anim-1">StudyBot</div>
+    <div class="cover-sub anim-2">AI Study Buddy for Lecture Summarization &amp; Q&amp;A</div>
+    <div class="cover-tagline anim-3">"Upload slides. Get smarter. In 30 seconds."</div>
+    <div class="cover-team anim-4">
+      <span class="label">Team G8</span> · <span class="label" style="color:var(--text-sec);font-weight:500">Domain A — EduTech</span>
+    </div>
+    <div class="cover-members anim-5">
+      Nguyễn Trần Huy Vũ · Ngô Thanh Tuấn · Đinh Minh Khoa · Nguyễn Khánh Duy · Nguyễn Đức Tài · Bùi Lê Tuấn · Trần Duy Khải · Đỗ Khánh Linh
+    </div>
+  </div>
+  <div class="cover-bottom anim-6">W7 Capstone Hackathon · May 2026</div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 2 — THE PROBLEM
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-warm" data-slide="2">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Vấn đề</div>
+    <div class="slide-subtitle anim-2">The Problem</div>
+
+    <div class="quote-block anim-3">
+      Ai cũng từng mất cả buổi chiều Chủ nhật để làm flashcard từ slide bài giảng
+    </div>
+
+    <div class="row anim-4" style="max-width:1050px">
+      <div class="card card-orange-border col">
+        <span class="emoji">📚</span>
+        <h3>40–60 slides/lecture</h3>
+        <p>Không biết đâu là trọng tâm thi</p>
+      </div>
+      <div class="card card-orange-border col">
+        <span class="emoji">⏰</span>
+        <h3>30–90 phút</h3>
+        <p>Tự tạo flashcard và câu hỏi ôn tập</p>
+      </div>
+      <div class="card card-orange-border col">
+        <span class="emoji">🤖</span>
+        <h3>ChatGPT hallucination</h3>
+        <p>Câu trả lời không trích dẫn được slide gốc</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 3 — OUR SOLUTION
+     ════════════════════════════════════════════════════════ -->
+<section class="slide" data-slide="3">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Giải pháp — <span class="accent">StudyBot</span></div>
+    <div class="slide-subtitle anim-2">Upload → Understand → Ace the Exam</div>
+
+    <div class="row anim-3" style="max-width:1050px">
+      <div class="card col" style="text-align:center">
+        <span class="emoji">📝</span>
+        <h3>Tóm tắt thông minh</h3>
+        <p>Upload PDF → 1-page summary với <strong>5 khái niệm trọng tâm</strong> trong 30s</p>
+      </div>
+      <div class="card col" style="text-align:center">
+        <span class="emoji">🃏</span>
+        <h3>Flashcard tự động</h3>
+        <p>AI tạo bộ flashcard từ nội dung slide, <strong>sẵn sàng ôn thi</strong></p>
+      </div>
+      <div class="card col" style="text-align:center">
+        <span class="emoji">❓</span>
+        <h3>Quiz &amp; Q&amp;A có trích dẫn</h3>
+        <p>10 câu MCQ + Chat hỏi đáp — mọi câu trả lời <strong>trích dẫn slide gốc</strong></p>
+      </div>
+    </div>
+
+    <div class="anim-4 mt-3" style="text-align:center">
+      <div style="font-size:13px;color:var(--text-sec);margin-bottom:8px">Real-world parallels</div>
+      <span class="badge">Quizlet AI</span>
+      <span class="badge">NotebookLM</span>
+      <span class="badge">Khanmigo</span>
+    </div>
+    <div class="anim-5 mt-2" style="font-size:14px;font-weight:600;color:var(--accent);text-align:center">
+      RAG từ tài liệu CỦA BẠN, không phải thư viện có sẵn
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 4 — ARCHITECTURE OVERVIEW
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-warm" data-slide="4">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Kiến trúc hệ thống</div>
+    <div class="slide-subtitle anim-2">Architecture Overview</div>
+
+    <div class="anim-3" style="width:100%;display:flex;justify-content:center">
+      <img src="./assets/hackathon.drawio.png" alt="Architecture Diagram" style="max-width:85%;height:auto;border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid rgba(0,0,0,0.06);">
+    </div>
+
+    <div class="metric-strip anim-4">
+      <div class="metric-item"><span class="emoji">🌍</span> Region: us-east-1</div>
+      <div class="metric-item"><span class="emoji">⚡</span> 100% Serverless — No EC2</div>
+      <div class="metric-item"><span class="emoji">🏗️</span> Terraform-managed (8 modules)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 5 — 7 MANDATORY CAPABILITIES
+     ════════════════════════════════════════════════════════ -->
+<section class="slide" data-slide="5">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">7 Năng lực bắt buộc</div>
+    <div class="slide-subtitle anim-2">Mandatory Capabilities</div>
+
+    <div class="anim-3" style="width:100%;overflow-x:auto;display:flex;justify-content:center">
+      <table class="styled-table">
+        <thead>
+          <tr><th>#</th><th>Capability</th><th>Service</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>UI Entry</td><td><strong>CloudFront</strong> + <strong>API Gateway HTTP</strong></td><td>HTTPS free, cheapest API entry</td></tr>
+          <tr><td>2</td><td>Compute</td><td><strong>Lambda</strong> Python 3.12 + FastAPI</td><td>Pay-per-use, 1M req free tier</td></tr>
+          <tr><td>3</td><td>AI / ML</td><td><strong>Bedrock KB</strong> + <strong>Claude Sonnet 4.5</strong></td><td>Grounded RAG with citation</td></tr>
+          <tr><td>4</td><td>Persistence</td><td><strong>DynamoDB</strong> on-demand (single-table)</td><td>All access single-key by user</td></tr>
+          <tr><td>5</td><td>Storage</td><td><strong>S3</strong> (2 buckets)</td><td>KB ingestion + static hosting</td></tr>
+          <tr><td>6</td><td>Network</td><td><strong>VPC</strong> + private subnets + <strong>Endpoints</strong></td><td>DB never public, no NAT</td></tr>
+          <tr><td>7</td><td>IAM</td><td>Least-privilege, no wildcards</td><td>Scoped S3 / DDB / Bedrock actions</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 6 — AI DEEP DIVE: BEDROCK RAG
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-warm" data-slide="6">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">AI Deep Dive</div>
+    <div class="slide-subtitle anim-2">Bedrock RAG Pipeline</div>
+
+    <div class="pipeline anim-3">
+      <div class="pipe-step">
+        <span class="emoji">📄</span>
+        <h4>Step 1 — Ingest</h4>
+        <p>PDF Upload → pypdf extraction → Slide-aware chunking</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <span class="emoji">📦</span>
+        <h4>Step 2 — Index</h4>
+        <p>S3 docs bucket → Bedrock KB (Titan Embeddings v2) → S3 Vectors</p>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <span class="emoji">💬</span>
+        <h4>Step 3 — Query</h4>
+        <p>User Query → Retrieve &amp; Generate → Claude Sonnet 4.5 → ✅ Cited Response</p>
+      </div>
+    </div>
+
+    <div class="spec-cards anim-4">
+      <div class="spec-card"><strong>KB ID:</strong> 11AOIXNNUM</div>
+      <div class="spec-card"><strong>Model:</strong> Claude Sonnet 4.5 (cross-region)</div>
+      <div class="spec-card"><strong>Vectors:</strong> S3 Vectors — <span style="color:var(--success)">$0.01</span> vs OpenSearch $51.84!</div>
+      <div class="spec-card"><strong>Chunking:</strong> Slide-aware preprocessing</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 7 — DECISION 1: PDF EXTRACTION
+     ════════════════════════════════════════════════════════ -->
+<section class="slide" data-slide="7">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Quyết định 1</div>
+    <div class="slide-subtitle anim-2">PDF Extraction Strategy — Density-gated multi-path</div>
+
+    <div class="anim-3" style="width:100%;overflow-x:auto;display:flex;justify-content:center">
+      <table class="styled-table">
+        <thead><tr><th style="width:60px">✓</th><th>Path</th><th>Best For</th><th>Latency</th><th>Cost / 1K uploads</th></tr></thead>
+        <tbody>
+          <tr style="background:#ECFDF5"><td style="color:var(--success)">✅</td><td class="chosen">pypdf (chosen)</td><td>Text-heavy PDF, fast</td><td>~0.05s p50</td><td>~$0</td></tr>
+          <tr><td style="color:#9CA3AF">❌</td><td class="rejected">Textract</td><td>Tables / scanned only</td><td>~1.5–2.0s p50</td><td>~$1.50</td></tr>
+          <tr><td style="color:#9CA3AF">❌</td><td class="rejected">Bedrock Vision</td><td>Diagram heavy</td><td>Slowest</td><td>~$5+</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="highlight-box-green anim-4 mt-3" style="max-width:600px">
+      💰 Savings: ~$1.50 / 1,000 uploads vs Textract
+    </div>
+    <div class="anim-5 mt-2" style="font-size:13px;color:var(--text-sec);text-align:center;max-width:600px">
+      Trade-off: Scanned PDF → degraded path with notice, not crash
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 8 — DECISION 2: MODEL CHOICE
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-warm" data-slide="8">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Quyết định 2</div>
+    <div class="slide-subtitle anim-2">AI Model Selection — Claude Sonnet 4.5 — 12× đắt hơn, nhưng đáng giá</div>
+
+    <div class="anim-3" style="width:100%;overflow-x:auto;display:flex;justify-content:center">
+      <table class="styled-table">
+        <thead><tr><th style="width:60px">✓</th><th>Model</th><th>Quality</th><th>Cost / query</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr><td style="color:#9CA3AF">❌</td><td class="rejected">Claude Haiku 3.5</td><td>Concept names yếu</td><td>~$0.001</td><td>Rejected</td></tr>
+          <tr style="background:#ECFDF5"><td style="color:var(--success)">✅</td><td class="chosen">Claude Sonnet 4.5</td><td>Best for lectures</td><td>~$0.017</td><td>Chosen</td></tr>
+          <tr><td style="color:#9CA3AF">❌</td><td class="rejected">Amazon Nova Lite</td><td>Blocked by policy</td><td>—</td><td>Blocked</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row anim-4 mt-3" style="max-width:700px;gap:16px">
+      <div class="card col" style="text-align:center;padding:18px">
+        <div style="font-size:11px;color:var(--text-sec);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Latency</div>
+        <div style="font-size:32px;font-weight:800;color:var(--accent)">~3s <span style="font-size:14px;font-weight:500">p50</span></div>
+      </div>
+      <div class="card col" style="text-align:center;padding:18px">
+        <div style="font-size:11px;color:var(--text-sec);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Demo Cost</div>
+        <div style="font-size:32px;font-weight:800;color:var(--accent)">$0.50–$2</div>
+      </div>
+      <div class="card col" style="text-align:center;padding:18px">
+        <div style="font-size:11px;color:var(--text-sec);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Cross-region</div>
+        <div style="font-size:32px;font-weight:800;color:var(--accent)">+50ms</div>
+      </div>
+    </div>
+    <div class="anim-5 mt-2" style="font-size:13px;color:var(--text-sec);text-align:center">
+      Hackathon scale OK. Production 10K queries/day → switch model
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 9 — DECISION 3: NETWORK DESIGN
+     ════════════════════════════════════════════════════════ -->
+<section class="slide" data-slide="9">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Quyết định 3</div>
+    <div class="slide-subtitle anim-2">Network — No NAT Gateway</div>
+
+    <div class="row anim-3" style="max-width:900px">
+      <div class="compare-col bad">
+        <div style="font-size:36px;margin-bottom:8px">❌</div>
+        <h3>NAT Gateway</h3>
+        <div style="font-size:28px;font-weight:800;color:#EF4444;margin:8px 0">$2.16<span style="font-size:14px;font-weight:500;color:var(--text-sec)">/48h</span></div>
+        <p style="text-align:center">Traffic exits to internet, then back into AWS</p>
+      </div>
+      <div class="compare-col good">
+        <div style="font-size:36px;margin-bottom:8px">✅</div>
+        <h3>VPC Endpoints</h3>
+        <div style="font-size:28px;font-weight:800;color:var(--success);margin:8px 0">$1.87<span style="font-size:14px;font-weight:500;color:var(--text-sec)">/48h</span></div>
+        <p style="text-align:center">Traffic stays on AWS backbone — faster &amp; cheaper</p>
+      </div>
+    </div>
+
+    <div class="highlight-box anim-4 mt-3" style="max-width:500px">
+      Net savings: <strong>$0.29/48h</strong> + better latency
+    </div>
+
+    <div class="anim-5 mt-3" style="text-align:center;font-size:13px;color:var(--text-sec);max-width:700px;line-height:1.8">
+      <strong style="color:var(--text)">Interface endpoints:</strong> bedrock-runtime · bedrock-agent-runtime · bedrock-agent<br>
+      <strong style="color:var(--text)">Gateway endpoints (FREE):</strong> S3 · DynamoDB
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 10 — SECURITY & IAM
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-warm" data-slide="10">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Bảo mật</div>
+    <div class="slide-subtitle anim-2">Security &amp; IAM</div>
+
+    <div class="anim-3" style="max-width:600px;width:100%">
+      <ul class="checklist">
+        <li><span class="check">✓</span> MFA on root account</li>
+        <li><span class="check">✓</span> No long-lived root access keys</li>
+        <li><span class="check">✓</span> IAM users cho từng thành viên (8 users)</li>
+        <li><span class="check">✓</span> Lambda role: scoped, no wildcards</li>
+        <li><span class="check">✓</span> Bedrock KB role: riêng biệt, S3 read only</li>
+        <li><span class="check">✓</span> S3 Block Public Access enabled</li>
+        <li><span class="check">✓</span> DB trong private subnet</li>
+      </ul>
+    </div>
+
+    <div class="highlight-box-green anim-4 mt-3" style="max-width:650px">
+      Không có AdministratorAccess · Không có wildcard * · Least-privilege enforced
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 11 — COST DISCIPLINE
+     ════════════════════════════════════════════════════════ -->
+<section class="slide" data-slide="11">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Chi phí</div>
+    <div class="slide-subtitle anim-2">Cost Discipline</div>
+
+    <div class="anim-3" style="text-align:center;margin-bottom:8px">
+      <div class="big-number">~$2–4</div>
+      <div style="font-size:16px;color:var(--text-sec);margin-top:4px">of $100 cap — only <strong style="color:var(--success)">2–4%</strong> used</div>
+    </div>
+
+    <div class="anim-4" style="width:100%;max-width:700px">
+      <div class="cost-bar-wrap">
+        <div class="cost-bar-label"><span>VPC Interface Endpoints ×3</span><span>$1.87 (1.9%)</span></div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:1.9%;background:var(--accent)"></div></div>
+      </div>
+      <div class="cost-bar-wrap" style="margin-top:10px">
+        <div class="cost-bar-label"><span>Bedrock Sonnet 4.5 tokens</span><span>$0.50–$2.00 (0.5–2%)</span></div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:2%;background:var(--warning)"></div></div>
+      </div>
+      <div class="cost-bar-wrap" style="margin-top:10px">
+        <div class="cost-bar-label"><span>Other (S3+CF+Lambda+DDB+CW)</span><span>&lt;$0.20 (&lt;0.2%)</span></div>
+        <div class="cost-bar-track"><div class="cost-bar-fill" style="width:0.2%;background:var(--success)"></div></div>
+      </div>
+    </div>
+
+    <div class="anim-5 mt-3" style="max-width:700px;width:100%">
+      <ul class="icon-list">
+        <li><span class="ico">🚫</span> Skipped NAT Gateway → saved <strong>$2.16</strong></li>
+        <li><span class="ico">💰</span> S3 Vectors vs OpenSearch → saved <strong>~$51.84!</strong></li>
+        <li><span class="ico">⚡</span> DynamoDB on-demand → no idle cost</li>
+        <li><span class="ico">📦</span> Stripped boto3 from zip → <strong>−25 MB</strong>, faster cold start</li>
+      </ul>
+    </div>
+
+    <div class="anim-6 mt-2">
+      <span class="badge badge-green" style="font-size:13px;padding:8px 20px">🏆 Bonus Path H candidate — Total &lt; $30 + clean teardown</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 12 — MONITORING
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-warm" data-slide="12">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Giám sát</div>
+    <div class="slide-subtitle anim-2">Monitoring &amp; Observability (Optional #8)</div>
+
+    <div class="row anim-3" style="max-width:900px">
+      <div class="card col">
+        <span class="emoji">📊</span>
+        <h3>Dashboard</h3>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:8px">studybot-prod-dashboard</p>
+        <ul>
+          <li>Lambda Errors + Duration</li>
+          <li>API Gateway requests + 5xx</li>
+        </ul>
+      </div>
+      <div class="card col">
+        <span class="emoji">🚨</span>
+        <h3>Alarm</h3>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:8px">studybot-prod-lambda-errors</p>
+        <ul>
+          <li>Metric: Lambda Errors &gt; 0 / 5 min</li>
+          <li>Triggered once → fixed ImportError</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="anim-4 mt-3" style="max-width:600px;width:100%">
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--text)">Honest Disclosure</div>
+      <ul class="checklist" style="font-size:14px">
+        <li><span class="check">✓</span> Dashboard (2 widget groups)</li>
+        <li><span class="check">✓</span> Alarm (OK/ALARM state)</li>
+        <li><span class="uncheck">▫</span> <span style="color:#9CA3AF">Custom metric (PutMetricData) — not done</span></li>
+        <li><span class="uncheck">▫</span> <span style="color:#9CA3AF">Log Insights query — not done</span></li>
+      </ul>
+      <div style="margin-top:10px;font-size:13px;color:var(--text-sec)">→ Partial credit: <strong>2/4</strong> components done</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 13 — LESSONS LEARNED
+     ════════════════════════════════════════════════════════ -->
+<section class="slide" data-slide="13">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Bài học</div>
+    <div class="slide-subtitle anim-2">Lessons Learned</div>
+
+    <div class="row anim-3" style="max-width:1050px;align-items:stretch">
+      <div class="card card-green col">
+        <span class="emoji">🟢</span>
+        <h3>What went well</h3>
+        <ul>
+          <li>Adapter pattern → pivot AI backend 2× without touching business logic</li>
+          <li>Terraform modular (8 modules) → one-command teardown</li>
+        </ul>
+      </div>
+      <div class="card card-red col">
+        <span class="emoji">🔴</span>
+        <h3>What we'd do differently</h3>
+        <ul>
+          <li>Lock down AWS account access Day 0</li>
+          <li>Lost ~6h: Bedrock blocked → Gemini pivot → teammate's account unblocked</li>
+        </ul>
+      </div>
+      <div class="card card-yellow col">
+        <span class="emoji">🟡</span>
+        <h3>Failure mitigated</h3>
+        <ul>
+          <li>Lambda zip stripped <code>annotated_doc</code> → Pydantic ImportError</li>
+          <li>Fix: remove from strip list, rebuild, documented</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 14 — DEMO
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-warm" data-slide="14">
+  <div class="center-col w100">
+    <div class="slide-title anim-1">Demo</div>
+    <div class="slide-subtitle anim-2">Xem StudyBot hoạt động</div>
+
+    <div class="anim-3">
+      <a href="https://d2ejfy6ejo0y9l.cloudfront.net" target="_blank" class="btn-link" style="animation:pulse-glow 2.5s infinite">
+        🌐 Mở StudyBot Live
+      </a>
+    </div>
+
+    <div class="anim-4 mt-3" style="font-size:13px;color:var(--text-sec);font-family:'JetBrains Mono',monospace">
+      API: https://pyzr1w8hi2.execute-api.us-east-1.amazonaws.com
+    </div>
+
+    <div class="video-wrap anim-5">
+      <iframe src="https://www.youtube.com/embed/rnfBWLGuT2I" title="StudyBot Demo Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div class="anim-6 mt-2" style="font-size:13px;color:var(--text-sec)">📹 Video backup demo (3 phút)</div>
+
+    <div class="anim-7 mt-3" style="font-size:16px;font-weight:700;color:var(--accent);text-align:center">
+      Trainer, hãy thử — click link, upload file, hỏi 1 câu bất kỳ ✨
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     SLIDE 15 — CLOSING
+     ════════════════════════════════════════════════════════ -->
+<section class="slide slide-closing" data-slide="15">
+  <div class="glow" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(255,107,44,0.07) 0%,transparent 70%);pointer-events:none"></div>
+  <div class="center-col" style="z-index:1">
+    <div class="cover-title anim-1" style="font-size:clamp(44px,6vw,72px)">Cảm ơn!</div>
+    <div class="anim-2" style="font-size:20px;color:var(--text-sec);margin-bottom:4px">Thank You</div>
+    <div class="anim-3" style="margin-top:8px;margin-bottom:20px">
+      <span class="badge" style="font-size:14px;padding:8px 20px">Team G8</span>
+    </div>
+    <div class="cover-members anim-4" style="margin-bottom:28px">
+      Nguyễn Trần Huy Vũ · Ngô Thanh Tuấn · Đinh Minh Khoa · Nguyễn Khánh Duy · Nguyễn Đức Tài · Bùi Lê Tuấn · Trần Duy Khải · Đỗ Khánh Linh
+    </div>
+
+    <div class="link-row anim-5">
+      <div class="link-item">🌐 <a href="https://d2ejfy6ejo0y9l.cloudfront.net" target="_blank">d2ejfy6ejo0y9l.cloudfront.net</a></div>
+      <div class="link-item">💻 <a href="https://github.com/MinhKhoa2209/Hackathon_AWS" target="_blank">github.com/MinhKhoa2209/Hackathon_AWS</a></div>
+      <div class="link-item">📹 <a href="https://www.youtube.com/watch?v=rnfBWLGuT2I" target="_blank">youtube.com/watch?v=rnfBWLGuT2I</a></div>
+    </div>
+
+    <div class="cover-tagline anim-6" style="margin-top:28px;font-size:16px">
+      "Upload slides. Get smarter. In 30 seconds."
+    </div>
+
+    <div class="qa-big anim-7">Q&amp;A</div>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<!-- ═══════════════════════════════════════════
+     PROGRESS BAR + COUNTER
+     ═══════════════════════════════════════════ -->
+<div id="progress-bar"></div>
+<div id="slide-counter"></div>
+<div id="nav-hint">← → Space</div>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPT — NAVIGATION ENGINE
+     ═══════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  const bar = document.getElementById('progress-bar');
+  const counter = document.getElementById('slide-counter');
+  let current = 0;
+
+  function goto(n) {
+    if (n < 0 || n >= total || n === current) return;
+    const prev = slides[current];
+    prev.classList.remove('active');
+    prev.classList.add('exit-up');
+    setTimeout(() => prev.classList.remove('exit-up'), 600);
+
+    current = n;
+    const next = slides[current];
+    next.classList.add('active');
+    updateUI();
+  }
+
+  function updateUI() {
+    const pct = ((current + 1) / total) * 100;
+    bar.style.width = pct + '%';
+    counter.textContent = (current + 1) + ' / ' + total;
+  }
+
+  function next() { goto(current + 1); }
+  function prev() { goto(current - 1); }
+
+  // Keyboard
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { e.preventDefault(); goto(0); }
+    else if (e.key === 'End') { e.preventDefault(); goto(total - 1); }
+  });
+
+  // Touch / click side areas
+  document.addEventListener('click', function (e) {
+    // Ignore clicks on links, buttons, iframes
+    if (e.target.closest('a, button, iframe')) return;
+    const x = e.clientX;
+    if (x < window.innerWidth * 0.3) prev();
+    else if (x > window.innerWidth * 0.7) next();
+  });
+
+  // Touch swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', function (e) {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) next(); else prev();
+    }
+  }, { passive: true });
+
+  // Animate cost bars on slide 11
+  function animateCostBars() {
+    const s11 = slides[10]; // 0-indexed
+    if (current === 10) {
+      const fills = s11.querySelectorAll('.cost-bar-fill');
+      // Scale up for visibility — multiply by 10 for visual effect
+      const widths = [19, 20, 2];
+      fills.forEach((f, i) => {
+        f.style.width = '0%';
+        setTimeout(() => { f.style.width = widths[i] + '%'; }, 400 + i * 200);
+      });
+    }
+  }
+
+  // Watch for slide changes to trigger animations
+  const origGoto = goto;
+  goto = function (n) {
+    origGoto(n);
+    if (n === 10) setTimeout(animateCostBars, 100);
+  };
+
+  // Init
+  slides[0].classList.add('active');
+  updateUI();
+})();
+</script>
+
+</body>
+</html>
