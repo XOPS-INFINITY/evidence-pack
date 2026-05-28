@@ -2,7 +2,7 @@
 
 ---
 
-## Table of Contents
+## Table of Content
 
 1. [W7 Requirements Summary](#1-w7-requirements-summary) — Crit II/IV
 2. [Cover](#2-cover) — Crit IV (context)
@@ -20,7 +20,7 @@
 
 ## 1. W7 Requirements Summary
 
-### Mandatory capabilities (must demo 7/7)
+### Mandatory capabilities
 
 - Public HTTPS URL (UI entry)
 - Application compute (backend processing)
@@ -30,11 +30,11 @@
 - Network isolation (DB not public)
 - IAM least-privilege for all services
 
-### Optional capability (pick one, partial credit allowed)
+### Optional capability
 
 - Full Observability or Advanced Cost Insights or Advanced Security
 
-### Pre-flight safety (required before paid deploy)
+### Pre-flight safety
 
 - MFA on root
 - Budget alert at $80 with confirmed SNS subscription
@@ -42,7 +42,7 @@
 - Tag every resource: Project=W7Capstone, Team=G<N>, Owner=<name>, Environment=hackathon
 - Bedrock model access enabled
 
-### Required deliverables (by Fri 09:00)
+### Required deliverables
 
 - Live public URL (HTTPS)
 - Public GitHub repo with setup + architecture + teardown instructions
@@ -59,9 +59,11 @@
 | **Team**                         | G8                                                                                                                              |
 | **Members**                      | Nguyễn Trần Huy Vũ, Ngô Thanh Tuấn, Đinh Minh Khoa, Nguyễn Khánh Duy, Nguyễn Đức Tài, Bùi Lê Tuấn, Trần Duy Khải, Đỗ Khánh Linh |
 | **Domain**                       | A — EduTech (AI Study Buddy)                                                                                                    |
+| **Project title**                | AI Study Buddy for Lecture Summarization and Q&A                                                                                |
 | **App name**                     | StudyBot                                                                                                                        |
-| **Repo**                         | [TBD repo URL]                                                                                                                  |
+| **Repo**                         | https://github.com/MinhKhoa2209/Hackathon_AWS.gitURL                                                                            |
 | **Live URL**                     | https://d2ejfy6ejo0y9l.cloudfront.net                                                                                           |
+| **Demo video**                   | https://www.youtube.com/watch?v=rnfBWLGuT2I                                                                                     |
 | **API endpoint**                 | https://pyzr1w8hi2.execute-api.us-east-1.amazonaws.com                                                                          |
 | **AWS account**                  | 273265662366                                                                                                                    |
 | **Region**                       | us-east-1                                                                                                                       |
@@ -71,7 +73,7 @@
 
 ## 3. Pitch & Vision
 
-### Use case (3-sentence pitch)
+### Use case
 
 University students drop a 40-slide lecture PDF into StudyBot and within 30 seconds
 receive a 1-page summary of the 5 most testable concepts, a deck of flashcards, and
@@ -110,7 +112,7 @@ legal research tools — so the work transfers.
 <p align="center">
   <img src="./assets/hackathon.drawio.png" alt="Architecture diagram" width="800"/>
   <br/>
-  <em>Hình 1: Final architecture diagram (pending draw.io export)</em>
+  <em>Figure 1: Overall architecture</em>
 </p>
 
 ### 7 mandatory capabilities — service mapping
@@ -125,7 +127,7 @@ legal research tools — so the work transfers.
 | 6   | Network Foundation           | **VPC** + 2 private subnets + **S3/DDB Gateway Endpoints** + **3 Bedrock Interface Endpoints** (`bedrock-runtime`, `bedrock-agent-runtime`, `bedrock-agent`) — **no NAT Gateway** | DB never public; saves $2.16/48h vs NAT; all AWS traffic stays on AWS backbone             |
 | 7   | Identity & Access (baseline) | **IAM least-privilege** Lambda role (`studybot-prod-lambda-role`) — scoped S3/DDB/Bedrock actions, no wildcards                                                                   | `X-User-Id` header for demo identity (Cognito optional per W7 #7)                          |
 
-### Optional capability attempted: #8 Full Observability (partial — 2/4)
+### Optional capability attempted: #8 Full Observability
 
 - Done: CloudWatch dashboard `studybot-prod-dashboard` — Lambda errors + duration, API GW count + 5xx
 - Done: Alarm `studybot-prod-lambda-errors` — fires on Lambda Errors > 0 over 5 min (currently in ALARM state because 1 historical error before fix; details in §8)
@@ -134,7 +136,7 @@ legal research tools — so the work transfers.
 
 Honest disclosure: 2/4 components done. Trainer should treat this as "partial credit" not full Optional capability.
 
-### 2-3 conscious trade-offs (summary; deep dive in §9)
+### 2-3 conscious trade-offs
 
 1. **Sonnet 4.5 over Haiku** — 12× more expensive per token but measurably better
    on lecture content; accepted for hackathon scale (~100 queries demo). Production
@@ -160,7 +162,7 @@ Use this section to attach configuration proof for each AWS service. Add the ima
   <em>Hình 2: CloudFront distribution overview (domain + status).</em>
 </p>
 
-### 5.2 S3 (frontend bucket)
+### 5.2 S3
 
 <p align=center>
   <img src=./assets/s3_permission_frontend.jpg alt=S3 bucket permissions width=800/>
@@ -180,7 +182,7 @@ Use this section to attach configuration proof for each AWS service. Add the ima
   <em>Hình 5: S3 bucket policy (frontend).</em>
 </p>
 
-### 5.3 S3 (docs bucket)
+### 5.3 S3
 
 <p align=center>
   <img src=./assets/properity_s3.jpg alt=S3 bucket properties width=800/>
@@ -194,7 +196,7 @@ Use this section to attach configuration proof for each AWS service. Add the ima
   <em>Hình 7: S3 bucket policy (docs).</em>
 </p>
 
-### 5.4 API Gateway (HTTP API)
+### 5.4 API Gateway
 
 <p align=center>
   <img src=./assets/routes_api_getway.jpg alt=API Gateway routes width=800/>
@@ -300,7 +302,7 @@ Use this section to attach configuration proof for each AWS service. Add the ima
 
 ## 6. Cost Discipline
 
-### Three Cost Explorer screenshots (required)
+### Three Cost Explorer screenshots
 
 | Day                    | Screenshot               | When                                |
 | ---------------------- | ------------------------ | ----------------------------------- |
@@ -308,14 +310,14 @@ Use this section to attach configuration proof for each AWS service. Add the ima
 | Thu 28/5 EOD           | `assets/cost_day2.png`   | [TBD]                               |
 | Fri 29/5 AM (pre-demo) | `assets/cost_friday.png` | [TBD]                               |
 
-### Top 3 cost drivers (estimated — verify Friday)
+### Top 3 cost drivers
 
-| Service                                                           | Estimate over 48h | % of $100 cap   |
-| ----------------------------------------------------------------- | ----------------- | --------------- |
-| Bedrock Sonnet 4.5 tokens (cross-region inference)                | ~$2.00–4.00       | 2-4%            |
-| VPC Interface Endpoints × 3 (Bedrock runtime/agent-runtime/agent) | $1.87             | 1.9%            |
-| CloudFront + DDB + Lambda + S3 + CloudWatch                       | <$0.50 combined   | <0.5%           |
-| **Estimated total**                                               | **~$4–6**         | **4-6%** of cap |
+| Service                                                                             | Estimate over 48h |    % of $100 cap | Rationale                                                              |
+| ----------------------------------------------------------------------------------- | ----------------: | ---------------: | ---------------------------------------------------------------------- |
+| VPC Interface Endpoints × 3 (bedrock-runtime, bedrock-agent-runtime, bedrock-agent) |             $1.87 |             1.9% | $0.01/h × 3 endpoints × 24h × 2 days — fixed cost regardless of usage  |
+| Bedrock Claude Sonnet 4.5 tokens (cross-region inference)                           |        $0.50–2.00 |           0.5–2% | Depends on demo query volume — estimated 30–120 queries × $0.017/query |
+| S3 + CloudFront + Lambda + DynamoDB + CloudWatch                                    |  < $0.20 combined |           < 0.2% | All within Free Tier or near-zero at hackathon scale                   |
+| **Estimated total**                                                                 |   **~$2.07–4.07** | **~2–4% of cap** |                                                                        |
 
 ### Cost discipline trade-offs
 
@@ -330,21 +332,29 @@ Use this section to attach configuration proof for each AWS service. Add the ima
 
 Bonus Path H candidate if total stays <$30 with clean teardown.
 
-### Cost reference baseline (from W7_cost_estimates)
+### Cost reference baseline
 
-Use these values to justify cost decisions and to show before/after optimization.
+Use these values to justify cost decisions and to show before/after optimization. All estimates are captured in the single calculator screenshot below.
 
-| Scenario                            | 48h cost (ap-southeast-1 reference) | Evidence link                                |
-| ----------------------------------- | ----------------------------------- | -------------------------------------------- |
-| StudyBot with S3 Vectors            | ~$1.57                              | [TBD add citation from W7_cost_estimates.md] |
-| StudyBot with OpenSearch Serverless | ~$29.20                             | [TBD add citation from W7_cost_estimates.md] |
-| NAT Gateway running 48h             | ~$2.83 (plus data)                  | [TBD add citation from W7_cost_estimates.md] |
+| Scenario                            | 72h cost (us-east-1 reference) |
+| :---------------------------------- | :----------------------------- |
+| StudyBot with S3 Vectors            | ~$0.01                         |
+| StudyBot with OpenSearch Serverless | ~$51.84                        |
+| NAT Gateway running 72h             | ~$3.29 (plus data)             |
+
+<p align=center>
+  <img src=./assets/cost_baseline.png alt=Cost baseline calculator width=800/>
+  <br/>
+  <em>Figure 25: Cost baseline calculator screenshot.</em>
+</p>
+
+> _Note: The OpenSearch Serverless cost is estimated at the AWS monthly baseline of $525.62 (as it cannot be natively configured for 72 hours in the calculator) and pro-rated for our 72-hour hackathon runtime: $525.62 ÷ 730 × 72 = $51.84._
 
 ---
 
 ## 7. Security
 
-### IAM baseline (required for Mandatory #7)
+### IAM baseline
 
 - **Lambda execution role**: `studybot-prod-lambda-role`
 - **Inline policy**: `studybot-prod-app` with 3 scoped statements:
@@ -356,9 +366,29 @@ Use these values to justify cost decisions and to show before/after optimization
 
 ### Root account hardening
 
-- MFA on root: [TBD verify in Console — IAM → Account → MFA status]
-- No long-lived root access keys: [TBD verify]
-- IAM users for each team member: [TBD verify]
+- MFA on root
+
+<p align=center>
+  <img src=./assets/MFA_on_root.jpeg alt=MFA on root width=800/>
+  <br/>
+  <em>Hình 25: MFA status on root account.</em>
+</p>
+
+- No long-lived root access keys
+
+<p align=center>
+  <img src=./assets/access_keys.jpeg alt=Root access keys width=800/>
+  <br/>
+  <em>Hình 26: Root access keys status.</em>
+</p>
+
+- IAM users for each team member
+
+<p align=center>
+  <img src=./assets/iam_user_for_group.jpeg alt=IAM users for team width=800/>
+  <br/>
+  <em>Hình 27: IAM users created for the team.</em>
+</p>
 
 ### Optional #10 Advanced Security — not yet implemented
 
@@ -496,7 +526,7 @@ Sonnet 4.5 is significantly more expensive than Haiku, so the cost is higher at 
 
 ---
 
-### 9.3 Decision 3 (optional) — Network design: VPC + Bedrock interface endpoints, no NAT
+### 9.3 Decision 3 — Network design: VPC + Bedrock interface endpoints, no NAT
 
 **Decision**
 Place Lambda in two private subnets, avoid a NAT Gateway, and use VPC endpoints for Bedrock, S3, and DynamoDB.
@@ -556,11 +586,11 @@ course-tag. Would add metadata filtering at ingestion time for production.
 
 ---
 
-## 11. Teardown Plan
+<h2 style="color:#000000;">11. Teardown Plan</h2>
 
-### Order (dependencies matter — Bedrock first because KB references S3)
+<h3 style="color:#000000;">Order</h3>
 
-```powershell
+<pre style="background-color:#111827; color:#f9fafb; padding:12px; border-radius:6px; overflow-x:auto;">
 # From terraform/ directory
 cd terraform
 
@@ -579,4 +609,4 @@ terraform destroy -var-file=terraform.tfvars
 
 # 4. Cost Explorer screenshot Monday 2/6 morning showing $0 accruing
 # Save as assets/teardown_zero_cost.png
-```
+</pre>
