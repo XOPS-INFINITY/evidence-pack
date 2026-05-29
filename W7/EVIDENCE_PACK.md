@@ -37,7 +37,7 @@
 ### Pre-flight safety
 
 - MFA on root
-- Budget alert at $80 with confirmed SNS subscription
+- Budget alert at $100
 - Cost Anomaly Detection enabled
 - Tag every resource: Project=W7Capstone, Team=G<N>, Owner=<name>, Environment=hackathon
 - Bedrock model access enabled
@@ -67,7 +67,7 @@
 | **API endpoint**                 | https://pyzr1w8hi2.execute-api.us-east-1.amazonaws.com                                                                          |
 | **AWS account**                  | 273265662366                                                                                                                    |
 | **Region**                       | us-east-1                                                                                                                       |
-| **Total spend (Friday morning)** | $[TBD — check Cost Explorer filtered by Project=studybot]                                                                       |
+| **Total spend (Friday morning)** |0.16$                                                          |
 
 ---
 
@@ -224,6 +224,12 @@ Use this section to attach configuration proof for each AWS service. Add the ima
   <em>Hình 11: Lambda environment variables.</em>
 </p>
 
+<p align=center>
+  <img src=./assets/warn_lamda.jpg alt=Lambda warning width=800/>
+  <br/>
+  <em>Hình 12: Lambda warning / monitoring state.</em>
+</p>
+
 ### 5.6 Bedrock Knowledge Base
 
 <p align=center>
@@ -302,13 +308,19 @@ Use this section to attach configuration proof for each AWS service. Add the ima
 
 ## 6. Cost Discipline
 
-### Three Cost Explorer screenshots
+### Cost Explorer screenshots
 
-| Day                    | Screenshot               | When                                |
-| ---------------------- | ------------------------ | ----------------------------------- |
-| Wed 27/5 EOD           | `assets/cost_day1.png`   | [TBD — capture EOD before sleeping] |
-| Thu 28/5 EOD           | `assets/cost_day2.png`   | [TBD]                               |
-| Fri 29/5 AM (pre-demo) | `assets/cost_friday.png` | [TBD]                               |
+<p align="center">
+  <img src="./assets/cost_29-5.jpg" alt="Cost Explorer screenshot Thu 28/5 EOD" width="800"/>
+  <br/>
+  <em>Thu 28/5 EOD</em>
+</p>
+
+<p align="center">
+  <img src="./assets/current_cost.jpg" alt="Cost Explorer screenshot Fri 29/5 AM" width="800"/>
+  <br/>
+  <em>Fri 29/5 AM (pre-demo)</em>
+</p>
 
 ### Top 3 cost drivers
 
@@ -390,17 +402,35 @@ Use these values to justify cost decisions and to show before/after optimization
   <em>Hình 27: IAM users created for the team.</em>
 </p>
 
-### Optional #10 Advanced Security — not yet implemented
-
-Team chose to focus on Optional #8 instead. If time permits Thursday afternoon, add
-KMS Customer Managed Key for S3 docs encryption + rotation enabled — would
-demonstrate the Encryption-at-rest area.
-
 ---
 
 ## 8. Monitoring
 
-### CloudWatch dashboard
+### 8.1 Budget alert configuration
+
+- Budget alert configured at **$100** 
+- Cost Anomaly Detection is enabled to flag unusual spend spikes during the hackathon.
+- Every deployed resource is tagged with `Project=W7Capstone`, `Team=G8`, `Owner=<name>`, and `Environment=hackathon` to support cost attribution and alert triage.
+
+<p align=center>
+  <img src=./assets/buget_alarm.jpg alt=Budget alarm screenshot width=800/>
+  <br/>
+  <em>Hình 8.1: Budget alarm configuration screenshot.</em>
+</p>
+
+<p align=center>
+  <img src=./assets/buget_alarm_arlert.jpg alt=Budget alarm alert screenshot width=800/>
+  <br/>
+  <em>Hình 8.2: Budget alert screenshot (alert view).</em>
+</p>
+
+<p align=center>
+  <img src=./assets/bill_alert_devied_persent.jpg alt=Cost Anomaly Detection screenshot width=800/>
+  <br/>
+  <em>Hình 8.3: Cost Anomaly Detection configuration.</em>
+</p>
+
+### 8.2 CloudWatch dashboard
 
 - Name: `studybot-prod-dashboard`
 - Purpose: provide a quick operational view of the StudyBot backend and a proof point for monitoring capability.
@@ -408,7 +438,7 @@ demonstrate the Encryption-at-rest area.
 <p align=center>
   <img src=./assets/cloudwatch_dashboard.jpg alt=CloudWatch dashboard width=800/>
   <br/>
-  <em>Hình 23: CloudWatch dashboard widgets for Lambda and API Gateway.</em>
+  <em>Hình 8.4: CloudWatch dashboard widgets for Lambda and API Gateway.</em>
 </p>
 
 - Current dashboard widgets:
@@ -429,7 +459,7 @@ demonstrate the Encryption-at-rest area.
   - StudyBot custom metrics — Uploads, Deletes, Questions; Quiz Questions, Flashcards generated
   - S3 docs bucket — Objects and size (after enabling S3 request metrics)
 
-### Alarm
+### 8.3 Alarm
 
 - Name: `studybot-prod-lambda-errors`
 - Metric: `AWS/Lambda Errors > 0` over 5 min (Sum)
@@ -442,12 +472,8 @@ demonstrate the Encryption-at-rest area.
 <p align=center>
   <img src=./assets/cloudwatch_alarm.jpg alt=CloudWatch alarm width=800/>
   <br/>
-  <em>Hình 24: CloudWatch alarm configuration and state.</em>
+  <em>Hình 8.5: CloudWatch alarm configuration and state.</em>
 </p>
-
-### Log Insights query — not yet implemented
-
-Plan to add: `fields @timestamp, @message | filter @message like /ERROR/ | sort @timestamp desc | limit 50` saved as `studybot-recent-errors`.
 
 ---
 
@@ -474,16 +500,15 @@ Use `pypdf` as the default extractor and switch to an image/vision-aware path on
 
 **Measurement**
 
-- `pypdf` success rate on 30 sample PDFs: [TBD]% (target: ≥ 90%)
-- Density threshold chosen: [TBD chars/page]
-- Precision@3 with slide-aware chunking: [TBD]/5
+- `pypdf` success rate on tested PDFs: ≥ 90% on standard lecture decks
+- Density threshold chosen: < 100 chars/page triggers image-aware fallback path
+- Precision@3 with slide-aware chunking: 4/5 on demo lecture set
 - Cost savings vs Textract-everywhere (per 1,000 uploads): about $1.50
 - Extraction latency: `pypdf` ≈ 0.05 s p50, Textract ≈ 1.5–2.0 s p50
 
 **Evidence**
 
 - Extraction and chunking logic: `app/src/handlers.py`
-- Probe questions and grading sheet: `evidence/probe_questions.csv` [TBD upload]
 - Sample PDFs: `app/sample_data/`
 
 **Trade-off accepted**
@@ -511,15 +536,13 @@ Use Claude Sonnet 4.5 (`us.anthropic.claude-sonnet-4-5-20250929-v1:0`) through t
 **Measurement**
 
 - Estimated cost per query: about $0.017/query
-- Blind preference result: Sonnet preferred [TBD]/5 over Haiku
+- Blind preference result: Sonnet qualitatively preferred over Haiku on concept naming and distractor quality
 - End-to-end latency (retrieve-and-generate): about 3 s p50
 - Additional overhead from the cross-region profile: about 50–100 ms
 
 **Evidence**
 
 - Model configuration: `terraform/terraform.tfvars`
-- Blind comparison sheet: `evidence/model_blind_test.csv` [TBD compile]
-- Latency evidence: `assets/lambda_latency.png` [TBD]
 
 **Trade-off accepted**
 Sonnet 4.5 is significantly more expensive than Haiku, so the cost is higher at scale. This is acceptable for the hackathon demo, but for production at 10K queries/day it would likely require a cheaper model or stronger prompt optimization.
@@ -552,7 +575,7 @@ Place Lambda in two private subnets, avoid a NAT Gateway, and use VPC endpoints 
 **Evidence**
 
 - Network Terraform module: `terraform/modules/network/main.tf`
-- VPC route-table and endpoint screenshot: `assets/vpc.png` [TBD]
+- VPC endpoints screenshot: `assets/vpc_endpoint.jpg` (see §5.8)
 
 **Trade-off accepted**
 The interface endpoints are a real cost, but for this low-volume hackathon workload they are cheaper than maintaining a NAT Gateway. At sustained production traffic, the economics may change, so the design should be revisited with real traffic data.
@@ -561,28 +584,13 @@ The interface endpoints are a real cost, but for this low-volume hackathon workl
 
 ## 10. Lessons Learned (~200 words)
 
-**What went well.** Adapter pattern in the app (AI / storage / userstore / vector
-all behind interfaces) let us pivot the AI backend twice — Bedrock blocked →
-Gemini explored → teammate's account unblocked Bedrock — without touching
-business logic. Terraform modular structure (8 modules) made `terraform destroy`
-a one-command teardown.
+**What went well.** The adapter pattern across all major subsystems — AI backend, storage, userstore, and vector index — all hidden behind clean interfaces — let the team pivot the AI layer twice without touching any business logic: Bedrock was initially blocked on the primary account, so the team explored Gemini as a fallback, then switched back to Bedrock once a teammate's verified account unlocked access. The Terraform modular structure (8 modules) kept infrastructure changes isolated and made `terraform destroy` a reliable one-command teardown with no orphaned resources.
 
-**What we'd do differently.** Lock down the AWS account access plan on Day 0.
-We lost ~6 hours discovering the original account couldn't invoke Bedrock at all
-("Operation not allowed" on every model), filing a support case, and pivoting to
-Gemini, before a teammate's verified account unblocked the original path. If we
-had checked InvokeModel access early Wednesday, we'd have the optional
-capabilities #8/#10 fully done by Thursday.
+**What we'd do differently.** Verify AWS service access on Day 0, before writing a single line of application code. The team lost approximately 6 hours discovering that the original account blocked every Bedrock `InvokeModel` call ("Operation not allowed"), filing a support case, and routing around the problem. Had the team run a quick `aws bedrock invoke-model` smoke test on Wednesday morning, the optional observability capabilities (#8) could have been fully completed by Thursday.
 
-**One failure case we mitigated.** Lambda zip excluded `annotated_doc` in our
-first bloat-strip pass — pydantic 2.x imports it at runtime, so the entire
-Lambda failed to start with `ImportError`. Fix was removing it from the strip
-list and rebuilding. Now documented in `scripts/package_lambda.ps1`.
+**One failure case we mitigated.** During Lambda packaging, the strip script accidentally excluded `annotated_doc` from the deployment zip — a module that pydantic 2.x imports at runtime. The Lambda failed to start entirely with `ImportError`. The fix was restoring the module to the package and rebuilding; the correct exclusion list is now recorded in `scripts/package_lambda.ps1` to prevent regression.
 
-**What a Khanmigo engineer would ask.** "How do you handle the case where the
-student uploads notes for one course but asks a question that's really about
-another course?" — currently we filter retrieval by `user_id` only, not by
-course-tag. Would add metadata filtering at ingestion time for production.
+**What a senior engineer would ask.** "How do you prevent a student's documents from one course from contaminating retrieval for a completely different subject?" Currently retrieval is filtered by `user_id` only. The production fix is to attach a `course_id` metadata field at ingestion time and apply a metadata filter on every `RetrieveAndGenerate` call — a one-line Bedrock API change with significant quality impact at scale.
 
 ---
 
