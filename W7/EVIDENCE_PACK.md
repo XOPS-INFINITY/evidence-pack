@@ -634,3 +634,4 @@ terraform destroy -var-file=terraform.tfvars
 # 4. Cost Explorer screenshot Monday 2/6 morning showing $0 accruing
 # Save as assets/teardown_zero_cost.png
 </pre>
+___
