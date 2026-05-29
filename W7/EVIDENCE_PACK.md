@@ -67,7 +67,7 @@
 | **API endpoint**                 | https://pyzr1w8hi2.execute-api.us-east-1.amazonaws.com                                                                          |
 | **AWS account**                  | 273265662366                                                                                                                    |
 | **Region**                       | us-east-1                                                                                                                       |
-| **Total spend (Friday morning)** |0.16$                                                          |
+| **Total spend (Friday morning)** | 0.16$                                                                                                                           |
 
 ---
 
@@ -408,7 +408,7 @@ Use these values to justify cost decisions and to show before/after optimization
 
 ### 8.1 Budget alert configuration
 
-- Budget alert configured at **$100** 
+- Budget alert configured at **$100**
 - Cost Anomaly Detection is enabled to flag unusual spend spikes during the hackathon.
 - Every deployed resource is tagged with `Project=W7Capstone`, `Team=G8`, `Owner=<name>`, and `Environment=hackathon` to support cost attribution and alert triage.
 
@@ -584,13 +584,29 @@ The interface endpoints are a real cost, but for this low-volume hackathon workl
 
 ## 10. Lessons Learned (~200 words)
 
-**What went well.** The adapter pattern across all major subsystems — AI backend, storage, userstore, and vector index — all hidden behind clean interfaces — let the team pivot the AI layer twice without touching any business logic: Bedrock was initially blocked on the primary account, so the team explored Gemini as a fallback, then switched back to Bedrock once a teammate's verified account unlocked access. The Terraform modular structure (8 modules) kept infrastructure changes isolated and made `terraform destroy` a reliable one-command teardown with no orphaned resources.
+**What went well.** Adapter pattern in the app (AI / storage / userstore / vector
+all behind interfaces) let us swap backends without touching business logic —
+switching from Nova Lite to Claude Sonnet 4.5 was a one-line tfvars change.
+Terraform modular structure (8 modules) made infrastructure reproducible and
+`terraform destroy` a one-command teardown. The presigned URL upload pattern
+solved the 6MB Lambda payload limit elegantly.
 
-**What we'd do differently.** Verify AWS service access on Day 0, before writing a single line of application code. The team lost approximately 6 hours discovering that the original account blocked every Bedrock `InvokeModel` call ("Operation not allowed"), filing a support case, and routing around the problem. Had the team run a quick `aws bedrock invoke-model` smoke test on Wednesday morning, the optional observability capabilities (#8) could have been fully completed by Thursday.
+**What we'd do differently.** Test Bedrock model access and Lambda concurrency
+limits on Day 0. We lost hours debugging 503 errors that turned out to be a
+10-concurrent-execution account limit — a simple quota check would have caught
+it immediately. Also, the fallback search logic (downloading all S3 docs for
+keyword matching) caused 90s timeouts under load; we should have trusted the
+KB retrieval from the start instead of building a redundant fallback path.
 
-**One failure case we mitigated.** During Lambda packaging, the strip script accidentally excluded `annotated_doc` from the deployment zip — a module that pydantic 2.x imports at runtime. The Lambda failed to start entirely with `ImportError`. The fix was restoring the module to the package and rebuilding; the correct exclusion list is now recorded in `scripts/package_lambda.ps1` to prevent regression.
+**One failure case we mitigated.** Boto3 `read_timeout=10s` was too aggressive
+for Bedrock RetrieveAndGenerate (~6-10s response time). Combined with 3 fallback
+model attempts, total time exceeded API Gateway's 30s hard limit. Fix: increased
+timeout to 25s and removed the expensive S3-scanning fallback entirely.
 
-**What a senior engineer would ask.** "How do you prevent a student's documents from one course from contaminating retrieval for a completely different subject?" Currently retrieval is filtered by `user_id` only. The production fix is to attach a `course_id` metadata field at ingestion time and apply a metadata filter on every `RetrieveAndGenerate` call — a one-line Bedrock API change with significant quality impact at scale.
+**What a Khanmigo engineer would ask.** "How do you handle multi-course isolation
+when students upload notes from different subjects?" — currently we filter by
+`user_id` only. Production would add course-tag metadata filtering at KB
+ingestion time to scope retrieval per subject.
 
 ---
 
